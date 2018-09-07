@@ -1,0 +1,111 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>实名认证</title>
+    <link rel="stylesheet" href="~/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="~/css/admin.css" media="all">
+    <script src="~/js/jquery-3.2.1.min.js"></script>
+    <style>
+        #LAY-component-grid-mobile .layui-card-body {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            height: 400px;
+        }
+        .input-groups{
+            padding:2px 0px 10px 2px;
+        }
+        .input-groups>label{
+            width:80px;
+        }
+        .input-groups>input {
+            width: 160px;
+         }
+    </style>
+</head>
+<body>
+    <div class="layui-fluid" id="LAY-component-grid-mobile">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs6">
+                <!-- 填充内容 -->
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <p>腾讯实名核身测试</p>
+                    </div>
+                    <div class="layui-card-body">
+                        <div class="input-groups">
+                            <label>分配的appid</label><input id="appid" type="text" class="layui-text" />
+                            <label>接口签名</label><input id="signature" type="text" class="layui-text" />
+                        </div>
+                        <div class="input-groups">
+                            <label>回调地址</label><input id="redirect" type="text" class="layui-text" />
+                            <label>一般传参用户 uid</label><input id="uid" type="text" class="layui-text" />
+                        </div>
+                        <div class="input-groups">
+                            <label>请求类型</label><input id="type" type="text" class="layui-text" />
+                            <label>身份证</label><input id="ID" type="text" class="layui-text" />
+                        </div>
+                        <div class="input-groups">
+                            <label>姓名</label><input id="name" type="text" class="layui-text" />
+                            <label>图片标志值</label><input id="pic_key" type="text" class="layui-text" />
+                        </div>
+                        <div class="input-groups">                         
+                            <label>参数签名校验</label><input id="sig" type="text" class="layui-text" />
+                        </div>
+                        <button style="height:30px" type="button"  authorize="yes" class="layui-btn layui-btn-warm layui-btn-xs" id="Test1"><i class="layui-icon">&#xe631;</i> 测试</button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <p>腾讯慧眼测试</p>
+                    </div>
+                    <div class="layui-card-body">
+                       
+                    </div>
+                </div>
+            </div>
+ 
+
+        </div>
+
+    </div>
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../../../layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index']);
+
+    </script>
+    <script>
+        $(function () { 
+            $.hands = {
+                Test1: function () {
+                    var urls = ' https://iauth-sandbox.wecity.qq.com/new/cgi-bin/auth.php';
+                    $.ajax({
+                        url: urls,
+
+                    });
+   
+                },
+                init:function(){
+                    $('#Test1').on('click', $.hands.Test1);
+                }
+
+            }
+          $.hands.init();
+        });
+    </script>
+</body>
+</html>

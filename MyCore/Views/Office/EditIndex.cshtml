@@ -1,0 +1,133 @@
+﻿
+@{
+    ViewData["Title"] = "EditIndex";
+    Layout = "~/Views/Share/_Layoutiframe.cshtml";
+}
+
+
+<script>
+    var keyValue = $.request("ids");
+    $(function () {
+        $("#ParentID").bindSelect({
+            url: "/Office/GetTreeSelectJson",
+        });
+        if (!!keyValue) {
+            $.ajax({
+                url: "/Office/GetFormList",
+                data: { ids: keyValue },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $("#form1").formSerialize(data);
+                }
+            });
+        }
+    });
+    function submitForm() {
+        $("#form1").validate({
+            rules: {
+                OfficeName: "required",
+                ParentID: "required",
+            }
+        });
+        if ($('#form1').valid()) {
+            $.loading(true, "正在提交数据");
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "/Office/EditOffice/",
+                    data: $('#form1').serialize(),
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        $.loading(false);
+
+                        if (data.errorMsg) {
+                            top.layer.msg(data.errorMsg, { icon: 2 });
+                        }
+                        else {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            $.currentWindow().$("#list1").trigger("reloadGrid");
+                            var msgs = (data.okMsg);
+                            top.layer.msg(msgs, { icon: 1 });
+                            parent.layer.close(index);
+                        }
+
+                    },
+                    error: function () {
+                        $.loading(false);
+
+                    },
+                    complete: function () {
+                        $.loading(false);
+                    }
+                });
+
+            }, 500);
+        }
+    }
+
+</script>
+<div style="margin-right:30px;padding-top:10px;">
+    <form id="form1" class="form-horizontal">
+        <div style="position:absolute;padding:10px;">
+            <table class="form">
+                <tr style="display:none;">
+                    <th class="formTitle">部门编号</th>
+                    <td class="formValue">
+                        <input id="OfficeID" name="OfficeID" type="text" class="form-control input-sm" placeholder="请输入角色名称" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">父节点</th>
+                    <td class="formValue" colspan="3">
+                        <select id="ParentID" name="ParentID"  class="form-control input-sm ">
+                            <option value="0">父节点</option>
+                        </select>
+                    </td>
+
+                </tr>
+                <tr>
+                    <th class="formTitle">部门名称</th>
+                    <td class="formValue" colspan="3">
+                        <input id="OfficeName" name="OfficeName" type="text" class="form-control input-sm" placeholder="请输入部门名称" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">负责人</th>
+                    <td class="formValue" colspan="3">
+                        <input id="FZName" name="FZName" type="text" class="form-control input-sm" placeholder="请输入负责人" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">备注</th>
+                    <td class="formValue" colspan="3">
+                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 80px;"></textarea>
+                    </td>
+
+                </tr>
+                <tr>
+                    <th class="formTitle">创建日期</th>
+                    <td class="formValue">
+                        <input id="CreateDate" name="CreateDate"  style=" width:100px;"  type="text" class="form-control input-sm" readonly="true" />
+                    </td>
+                    <th class="formTitle">创建人</th>
+                    <td class="formValue">
+                        <input id="CreateName" name="CreateName"   style=" width:100px;"  type="text" class="form-control input-sm" readonly="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">修改日期</th>
+                    <td class="formValue">
+                        <input id="EditeDate" name="EditeDate"  style=" width:100px;" type="text" class="form-control input-sm" readonly="true" />
+                    </td>
+                    <th class="formTitle">修改人</th>
+                    <td class="formValue">
+                        <input id="EditName" name="EditName"  style=" width:100px;" type="text" class="form-control input-sm" readonly="true" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+

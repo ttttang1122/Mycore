@@ -1,0 +1,154 @@
+﻿
+@{
+    ViewData["Title"] = "AddIndex";
+    Layout = "~/Views/Share/_Layoutiframe.cshtml";
+}
+<script>
+    $(function () {
+        $("#RID").bindSelect({
+            url: "/User/GetRole",
+            id: "id",
+            text: "RoleName"
+        });
+        $("#OID").bindSelect({
+            url: "/User/GetOffice",
+            id: "id",
+            text: "OfficeName"
+        });
+
+        layui.use(['form', 'layedit', 'laydate'], function () {
+
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , laydate = layui.laydate;
+
+            form.render();     
+
+        });
+
+    });
+    function submitForm() {
+        $("#form1").validate({
+            rules: {
+                UserName: "required",
+                LoginName: "required",
+                LoginPWD: "required",
+                LoginPWDTwo: {
+                    equalTo: "#LoginPWD"
+                }
+            }
+        });
+
+        if ($('#form1').valid()) {
+            $.loading(true, "正在提交数据");
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "/User/AddUser/",
+                    data: $('#form1').serialize(),
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        $.loading(false);
+
+                        if (data.errorMsg) {
+                            layer.msg(data.errorMsg, { icon: 2 });
+                        }
+                        else {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            $.currentWindow().$("#list1").trigger("reloadGrid");
+                            var msgs = (data.okMsg);
+                            top.layer.msg(msgs, { icon: 1 });
+                            parent.layer.close(index);
+                        }
+
+                    },
+                    error: function (xhr, type, errorThrown) {
+                        $.loading(false);;
+                        if (type === 'timeout') {
+                            layer.msg('连接超时，请稍后重试！', { icon: 2 });
+                        } else if (type === 'error') {
+                            layer.msg('连接异常，请稍后重试！', { icon: 2 });
+                        }
+
+                    },
+                    complete: function () {
+                        $.loading(false);
+                    }
+                });
+
+            }, 500);
+        }
+    }
+</script>
+
+<div style="margin-right:30px;padding-top:10px;">
+    <form id="form1" class="layui-form">
+        <div style="position:absolute; padding-right:10px;">
+            <table class="form">
+                <tr>
+                    <th class="formTitle">用户名</th>
+                    <td class="formValue">
+                        <input id="UserName" name="UserName" type="text" class="form-control input-sm" placeholder="请输入用户名" />
+                    </td>
+                    <th class="formTitle">登录名</th>
+                    <td class="formValue">
+                        <input id="LoginName" name="LoginName" type="text" class="form-control input-sm" placeholder="请输入登录名" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <th class="formTitle">输入密码</th>
+                    <td class="formValue">
+                        <input id="LoginPWD" name="LoginPWD" type="password" class="form-control input-sm" placeholder="请输入登录密码" />
+                    </td>
+                    <th class="formTitle">确认密码</th>
+                    <td class="formValue">
+                        <input id="LoginPWDTwo" name="LoginPWDTwo" type="password" class="form-control input-sm" placeholder="请再次确认登录密码" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">角色</th>
+                    <td class="formValue">
+                        <select id="RID" name="RID" lay-verify="required" lay-search="">
+                            <option value="">请选择或搜索</option>
+                        </select>
+             
+                    </td>
+                    <th class="formTitle">部门</th>
+                    <td class="formValue">
+                        <select id="OID" name="OID" lay-verify="required" lay-search="">
+                            <option value="">请选择或搜索</option>
+                        </select>
+                    
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">性别</th>
+                    <td class="formValue">
+                        <select id="Sex" name="Sex" lay-verify="required">
+                            <option value=""></option>
+                            <option value="男">男</option>
+                            <option value="女">女</option>
+                        </select>
+
+                    </td>
+                    <th class="formTitle">联系手机</th>
+                    <td class="formValue">
+                        <input id="Phone" name="Phone" type="text" class="form-control input-sm" placeholder="请输入联系方式" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">备注</th>
+                    <td class="formValue" colspan="3">
+                        <textarea id="Remark" name="Remark" class="form-control input-sm" style="height: 120px;"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+
+
+ 

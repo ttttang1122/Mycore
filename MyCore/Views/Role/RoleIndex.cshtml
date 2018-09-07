@@ -1,0 +1,171 @@
+﻿
+@{
+    ViewData["Title"] = "RoleIndex";
+    Layout = "~/Views/Share/_LayoutBody.cshtml";
+}
+
+<div class="list-wall">
+    <div class="list-top">
+        <button type="button" authorize="yes" class="layui-btn layui-btn-warm layui-btn-xs" data-type="Add" id="Add"><i class="layui-icon">&#xe61f;</i> 新增</button>
+        <button type="button" authorize="yes" class="layui-btn layui-btn-normal layui-btn-xs" data-type="Edit" id="Edit"><i class="layui-icon">&#xe642;</i> 修改</button>
+        <button type="button" authorize="yes" class="layui-btn layui-btn-danger layui-btn-xs" data-type="Del" id="Del"><i class="layui-icon ">&#xe640;</i> 删除</button>
+        <button type="button" authorize="yes" class="layui-btn layui-btn-warm layui-btn-xs" data-type="Authorize" id="Authorize"><i class="layui-icon ">&#xe641;</i> 授权</button>
+        <input type="text" authorize="yes" id="StrSearch" data-type="Search" name="StrSearch" placeholder="请输入关键字" autocomplete="off" class="layui-input">
+        <button type="button" authorize="yes" class="layui-btn  layui-btn-xs" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i> 查询</button>
+    </div>
+    <div class="gridPanel">
+        <table id="list1" class="table table-condensed"></table>
+        <div id="pager1"></div>
+    </div>
+</div>
+<script>$('.list-top').authorizeButton()</script>
+<script>
+    var bodyheight = 0;
+      $(function () {
+        bodyheight = document.body.scrollHeight;
+        $("#list1").jqGrid({
+            styleUI: 'Bootstrap',
+            url: '@Url.Action("RoleList")',
+            datatype: "json",
+            jsonReader: {
+                repeatitems: false
+            },
+            colModel: [
+                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true},
+                { label: '角色编号', name: 'RoleID', index: 'RoleID', width: 120, hidden: true },
+                { label: '角色名称', name: 'RoleName', index: 'RoleName', width: 120, align: 'center' },
+                { label: '税号', name: 'Swdjh', index: 'Swdjh', width: 120, hidden: true },
+                { label: '类型', name: 'RoleType', index: 'RoleType', width: 120, align: 'center' },
+                { label: '状态', name: 'Status', index: 'Status', width: 50, align: 'center' },
+                { label: '备注', name: 'BZ', index: 'BZ', width: 130, align: 'center' },
+                { label: '创建日期', name: 'CreateDate', index: 'CreateDate', width: 100, align: 'center' },
+                { label: '创建人', name: 'CreateName', index: 'CreateName', width: 100, align: 'center' },
+                { label: '修改日期', name: 'EditDate', index: 'EditDate', width: 100, align: 'center' },
+                { label: '修改人', name: 'EditName', index: 'EditName', width: 100, align: 'center' }
+
+            ],
+            width: "99%",
+            autowidth: true,
+            height: $(window).height()-110,
+            rowNum: 30,//一页显示多少条
+            rowList: [10,20,30,50,100],//可供用户选择一页显示多少条
+            pager: '#pager1',//表格页脚的占位符(一般是div)的id
+            sortname: 'id',//初始化的时候排序的字段
+            sortorder: "desc",//排序方式,可选desc,asc
+            mtype: "post",//向后台请求数据的ajax的类型。可选post,get
+            viewrecords: true,
+            shrinkToFit: false,
+            rownumbers: true,
+          });
+
+
+    });
+    $(function () {
+        $(window).bind('resize', function () {
+            $("#list1").setGridWidth($(window).width() - 20);
+            $("#list1").setGridHeight($(window).height() - 110);
+        }).trigger('resize');
+    });
+
+    $(function (){
+        $.hands = {
+            Add: function () {
+                $.FromOpen('RoleFromAdd', '新增角色', '/Role/AddIndex', '600px', '280px', '1000');
+            },
+            Edit: function () {
+                var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+                var rowData = $("#list1").jqGrid("getRowData", id);//根据上面的id获得本行的所有数据
+                var ids = rowData.id; //获得制定列的值 （UserID 为colModel的name）
+                if (ids == null || ids == undefined) {
+                    layer.msg("请选择一行", { icon: 2 });
+                    return;
+                }
+                var url = "/Role/EditIndex" + "?ids=" + ids;
+                $.FromOpen('RoleFromEdit', '修改角色', url, '600px', '300px', '1000');
+
+            },
+            Del: function () {
+                var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+                var rowData = $("#list1").jqGrid("getRowData", id);//根据上面的id获得本行的所有数据
+                var ids = rowData.id; //获得制定列的值 （UserID 为colModel的name）
+                if (ids == null || ids == undefined) {
+                    layer.msg("请选择一行", { icon: 2 });
+                    return;
+                }
+                layer.confirm('确认要删除选择的数据吗？', {
+                    title: "删除角色",
+                    btn: ['确定', '关闭'] //按钮
+                }, function (index, layero) {
+                    $.loading(true, "正在删除数据");
+                    window.setTimeout(function () {
+                        $.ajax({
+                            url: "/Role/DeleteRole/",
+                            data: { ids: ids },
+                            type: "post",
+                            dataType: "json",
+                            success: function (data) {
+                                $.loading(false);
+                                if (data.errorMsg) {
+                                    layer.msg(data.errorMsg, { icon: 2 });
+                                }
+                                else {
+                                    $("#list1").trigger("reloadGrid");
+
+                                }
+                            },
+                            error: function () {
+                                $.loading(false);
+
+                            },
+                            complete: function () {
+                                $.loading(false);
+                            }
+                        });
+
+                    }, 500);
+                    layer.close(index);
+
+                }, function () {
+                    return true;
+                });
+            },
+            Authorize: function () {
+                var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+                var rowData = $("#list1").jqGrid("getRowData", id);//根据上面的id获得本行的所有数据
+                var ids = rowData.id; //获得制定列的值 （UserID 为colModel的name）
+                if (ids == null || ids == undefined) {
+                    layer.msg("请选择一行", { icon: 2 });
+                    return;
+                }
+                var url = "/Role/AuthorizeIndex" + "?ids=" + ids;
+                $.FromOpen('RoleFromAuthorize', '角色授权', url, '500px', '400px', '1000');
+
+            },
+            Search: function () {
+                $.loading(true, "正在查询数据");
+                var StrSearch = $('#StrSearch').val();
+                window.setTimeout(function () {
+                    $("#list1").jqGrid('setGridParam', {
+                        datatype: 'json',
+                        postData: { 'StrSearch': StrSearch},
+                        //page: 1
+                    }).trigger("reloadGrid");
+
+                    $.loading(false);
+                }, 500);
+            },
+            init:function() {
+                $('#Add').on('click', $.hands.Add);
+                $('#Edit').on('click', $.hands.Edit);
+                $('#Del').on('click', $.hands.Del);
+                $('#Authorize').on('click', $.hands.Authorize);
+                $('#Search').on('click', $.hands.Search);
+            }
+        }
+        $(function () {
+            $.hands.init();
+        });
+    });
+
+</script>
+

@@ -1,0 +1,57 @@
+﻿
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>View</title>
+    <link href="~/layuiadmin/layui/css/layui.css" rel="stylesheet" />
+    <link href="~/css/admin.css" rel="stylesheet" />
+    <link href="~/lib/JqGrid/css/ui.jqgrid.css" rel="stylesheet" />
+    <link href="~/lib/JqGrid/css/ui.jqgrid-bootstrap-ui.css" rel="stylesheet" />
+    <link href="~/lib/JqGrid/css/ui.jqgrid-bootstrap.css" rel="stylesheet" />
+    <link href="~/lib/Bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link href="~/css/app.css" rel="stylesheet" />
+
+    <script src="~/js/jquery-3.2.1.min.js"></script>
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <script src="~/layuiadmin/layui/layui.all.js"></script>
+    <script src="~/lib/JqGrid/js/jquery.jqGrid.min.js"></script>
+    <script src="~/lib/Bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/lib/JqGrid/src/grid.treegrid.js"></script>
+    <script src="~/lib/JqGrid/js/i18n/grid.locale-cn.js"></script>
+    <script src="~/layuiadmin/lib/FrameWork.js"></script>
+
+    <style>
+        .layui-form-label {
+            float: left;
+            display: block;
+            padding: 9px 10px;
+            width: 60px;
+            font-weight: 400;
+            line-height: 20px;
+            text-align: right;
+            font-size: 12px;
+        }
+
+        .layui-form-select dl dd, .layui-form-select dl dt {
+            line-height: 24px;
+        }
+
+        .layui-form-item .layui-input-inline {
+            font-size: 12px;
+        }
+
+        .layui-input, .layui-select, .layui-textarea {
+            height: 25px;
+        }
+
+        .layui-unselect dl {
+            max-height: 200px;
+        } 
+    </style>
+</head>
+<body>
+    @RenderBody()
+</body>
+</html>

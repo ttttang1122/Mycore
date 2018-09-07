@@ -1,0 +1,126 @@
+﻿
+@{
+    ViewData["Title"] = "EditIndex";
+    Layout = "~/Views/Share/_Layoutiframe.cshtml";
+}
+
+
+<script>
+    var keyValue = $.request("ids");
+    $(function () {
+
+        if (!!keyValue) {
+            $.ajax({
+                url: "/StoreInfo/GetFormList",
+                data: { ids: keyValue },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $("#form1").formSerialize(data);
+                }
+            });
+        }
+        layui.use(['form', 'layedit', 'laydate'], function () {
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , laydate = layui.laydate;
+
+            form.render();
+
+        });
+    });
+    function submitForm() {
+        $("#form1").validate({
+            rules: {
+                StoreName: "required"
+            }
+        });
+        if ($('#form1').valid()) {
+           $.loading(true, "正在提交数据");
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "/StoreInfo/EditStore/",
+                    data: $('#form1').serialize(),
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.errorMsg) {
+                            top.layer.msg(data.errorMsg, { icon: 2 });
+                        }
+                        else {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            $.currentWindow().$("#list1").trigger("reloadGrid");
+                            var msgs = (data.okMsg);
+                            top.layer.msg(msgs, { icon: 1 });
+                            parent.layer.close(index);
+                        }
+
+                    },
+                    error: function () {
+                        $.loading(false);
+
+                    },
+                    complete: function () {
+                        $.loading(false);
+                    }
+                });
+
+            }, 500);
+        }
+    }
+
+</script>
+<div style="margin-right:30px;padding-top:10px;">
+    <form id="form1" class="layui-form">
+        <div style="position:absolute;">
+            <table class="form">
+                <tr style="display:none;">
+                    <th class="formTitle">序号</th>
+                    <td class="formValue">
+                        <input id="id" name="id" type="text" class="form-control input-sm" readonly="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">仓库名称</th>
+                    <td class="formValue">
+                        <input id="StoreName" name="StoreName" type="text" class="form-control input-sm" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <th class="formTitle">地址</th>
+                    <td class="formValue">
+                        <input id="Address" name="Address" type="text" class="form-control input-sm" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <th class="formTitle">面积</th>
+                    <td class="formValue">
+                        <input id="Sizes" name="Sizes" type="text" class="form-control input-sm" />
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <th class="formTitle">用途描述</th>
+                    <td class="formValue">
+                        <textarea id="UseSay" name="UseSay" class="form-control input-sm" style="height: 60px;"></textarea>
+                    </td>
+     
+
+                </tr>
+                <tr>
+                    <th class="formTitle">备注</th>
+                    <td class="formValue">
+                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 60px;"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+
+
+

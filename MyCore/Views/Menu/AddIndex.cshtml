@@ -1,0 +1,121 @@
+﻿
+@{
+    ViewData["Title"] = "AddIndex";
+    Layout = "~/Views/Share/_Layoutiframe.cshtml";
+}
+
+<script>
+    function submitForm() {
+
+        $("#form1").validate({
+            rules: {
+                MenuName: "required",
+                MenuNameCN: "required",
+                ParentID: "required",
+                MenuSort: "required",
+                MenuType: "required",
+            }
+        });
+        if ($('#form1').valid()) {
+            $.loading(true, "正在提交数据");
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "/Menu/AddMenu/",
+                    data: $('#form1').serialize(),
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        $.loading(false);
+
+                        if (data.errorMsg) {
+                            top.layer.msg(data.errorMsg, { icon: 2 });
+                        }
+                        else {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            $.currentWindow().$("#list1").trigger("reloadGrid");
+                            var msgs = (data.okMsg);
+                            top.layer.msg(msgs, { icon: 1 });
+                            parent.layer.close(index);
+                        }
+
+                    },
+                    error: function () {
+                        $.loading(false);
+
+                    },
+                    complete: function () {
+                        $.loading(false);
+                    }
+                });
+
+            }, 500);
+        }
+    }
+    $(function () {
+        var keyValue = '@(ViewBag.MenuID)';
+        $("#MenuParentID").bindSelect({
+            url: "/Menu/GetTreeSelectJson",
+        });
+        if (keyValue != null || keyValue != undefined || keyValue != "") {
+            //$("#MenuParentID").attr("value", keyValue);
+            $("#MenuParentID").val(keyValue);
+        }
+    });
+
+</script>
+<div style="margin-right:30px;padding-top:10px;">
+    <form id="form1" class="form-horizontal">
+        <div style="position:absolute; padding-right:10px;">
+            <table class="form">
+                <tr>
+                    <th class="formTitle">父节点</th>
+                    <td class="formValue">
+                        <select id="MenuParentID" name="MenuParentID" class="form-control  input-sm">
+                            <option value="0">父节点</option>
+                        </select>
+                    </td>
+                    <th class="formTitle">菜单名称</th>
+                    <td class="formValue">
+                        <input id="MenuName" name="MenuName" type="text" class="form-control input-sm" placeholder="请输入菜单名称" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">标签名称</th>
+                    <td class="formValue">
+                        <input id="MenuNameCN" name="MenuNameCN" type="text" class="form-control input-sm" placeholder="请输入菜单显示名称" />
+                    </td>
+                    <th class="formTitle">菜单类型</th>
+                    <td class="formValue">
+                        <select id="MenuType" name="MenuType" class="form-control input-sm">
+                            <option value="1">菜单</option>
+                            <option value="2">按钮</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">连接</th>
+                    <td class="formValue">
+                        <input id="MenuUrl" name="MenuUrl" type="text" class="form-control input-sm" placeholder="请输入连接" />
+                    </td>
+                    <th class="formTitle">排序</th>
+                    <td class="formValue">
+                        <input id="MenuSort" name="MenuSort" type="text" class="form-control input-sm" placeholder="请输入排序" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">图标</th>
+                    <td class="formValue" colspan="3">
+                        <input id="MenuIcon" name="MenuIcon" type="text" class="form-control input-sm" placeholder="请输入图标" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">备注</th>
+                    <td class="formValue" colspan="3">
+                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 60px;"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+

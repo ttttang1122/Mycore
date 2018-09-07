@@ -1,0 +1,94 @@
+﻿
+@{
+    ViewData["Title"] = "AddIndex";
+    Layout = "~/Views/Share/_Layoutiframe.cshtml";
+}
+
+
+<script>
+    function submitForm() {
+        $("#form1").validate({
+            rules: {
+                ParentID: "required",
+                OfficeName: "required",
+            }
+        });
+        if ($('#form1').valid()) {
+            $.loading(true, "正在提交数据");
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "/Office/AddOffice/",
+                    data: $('#form1').serialize(),
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        $.loading(false);
+
+                        if (data.errorMsg) {
+                            top.layer.msg(data.errorMsg, { icon: 2 });
+                        }
+                        else {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            $.currentWindow().$("#list1").trigger("reloadGrid");
+                            var msgs = (data.okMsg);
+                            top.layer.msg(msgs, { icon: 1 });
+                            parent.layer.close(index);
+                        }
+
+                    },
+                    error: function () {
+                        $.loading(false);
+
+                    },
+                    complete: function () {
+                        $.loading(false);
+                    }
+                });
+
+            }, 500);
+        }
+    }
+    $(function () {
+        $("#ParentID").bindSelect({
+            url: "/Office/GetTreeSelectJson",
+        });
+    });
+
+</script>
+<div style="margin-right:30px;padding-top:10px;">
+    <form id="form1" class="form-horizontal">
+        <div style="position:absolute; padding-right:10px;">
+            <table class="form">
+                <tr>
+                    <th class="formTitle">父节点</th>
+                    <td class="formValue">
+                        <select id="ParentID" name="ParentID" class="form-control input-sm ">
+                            <option value="0">父节点</option>
+                        </select>
+                    </td>
+
+                </tr>
+                <tr>
+                    <th class="formTitle">部门名称</th>
+                    <td class="formValue">
+                        <input id="OfficeName" name="OfficeName"  type="text" class="form-control input-sm" placeholder="请输入部门名称" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">负责人</th>
+                    <td class="formValue">
+                        <input id="FZName" name="FZName" type="text" class="form-control input-sm" placeholder="请输入负责人" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">备注</th>
+                    <td class="formValue" >
+                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 80px; "></textarea>
+                    </td>
+
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+

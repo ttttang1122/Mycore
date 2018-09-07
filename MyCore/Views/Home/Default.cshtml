@@ -1,0 +1,334 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>首页</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="~/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="~/css/admin.css" media="all">
+    <script src="~/js/jquery-3.2.1.min.js"></script>
+    <script src="~/layuiadmin/lib/Chart.js"></script>
+</head>
+<body>
+
+    <style>
+        #LAY-component-grid-mobile .layui-card-body {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            height: 250px;
+        }
+    </style>
+
+    <div class="layui-fluid" id="LAY-component-grid-mobile">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs6">
+                <!-- 填充内容 -->
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <p>
+                           柱状图
+                        </p>
+                    </div>
+                    <div class="layui-card-body">
+                      <canvas height="250" id="myChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        折线图
+                    </div>
+                    <div class="layui-card-body">
+                        <canvas height="250"  id="zxChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        饼形图
+                    </div>
+                    <div class="layui-card-body">
+                        <canvas height="250"  id="PieChart" ></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs6">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        雷达图
+                    </div>
+                    <div class="layui-card-body">                     
+                        <canvas  height="250" id="radarChart" ></canvas>
+                    </div>
+                </div>
+            </div>
+         
+        </div>
+        
+    </div>
+
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <script>
+  layui.config({
+    base: '../../../layuiadmin/' //静态资源所在路径
+  }).extend({
+    index: 'lib/index' //主入口模块
+            }).use(['index']);
+
+    </script>
+    <script>
+        //更新全部
+        //Chart.plugins.register({
+        //    afterDatasetsDraw: function (chart) {
+        //        var ctx = chart.ctx;
+
+        //        chart.data.datasets.forEach(function (dataset, i) {
+        //            var meta = chart.getDatasetMeta(i);
+        //            if (!meta.hidden) {
+        //                meta.data.forEach(function (element, index) {
+        //                    // Draw the text in black, with the specified font
+        //                    ctx.fillStyle = 'rgb(0, 0, 0)';
+
+        //                    var fontSize = 16;
+        //                    var fontStyle = 'normal';
+        //                    var fontFamily = 'Helvetica Neue';
+        //                    ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+        //                    // Just naively convert to string for now
+        //                    var dataString = dataset.data[index].toString();
+
+        //                    // Make sure alignment settings are correct
+        //                    ctx.textAlign = 'center';
+        //                    ctx.textBaseline = 'middle';
+
+        //                    var padding = 5;
+        //                    var position = element.tooltipPosition();
+        //                    ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+        //                });
+        //            }
+        //        });
+        //    }
+        //});
+    </script>
+    <script>
+        function getSum(total, num) {
+            return total + num;
+        }
+        var Piectx = $("#PieChart").get(0).getContext("2d");
+        var myPieChart = new Chart(Piectx, {
+            type: 'pie',
+            data: {
+                datasets: [{
+                    data: [15, 25, 20, 35, 10, 18, 30],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)',
+                        'rgba(182, 255, 0, 0.5)'
+                    ]
+                }],
+                labels: [
+                    '周一',
+                    '周二',
+                    '周三',
+                    '周四',
+                    '周五',
+                    '周六',
+                    '周日'
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "多吃水果"
+                },
+                legend: {
+                    position: 'right',
+                }
+               
+            },
+            plugins: [{
+                afterDatasetsDraw: function (chart) {
+                    var ctx = chart.ctx;
+                    chart.data.datasets.forEach(function (dataset, i) {
+                        var meta = chart.getDatasetMeta(i);                        
+                        if (!meta.hidden) {
+                            var sums = dataset.data.reduce(getSum);
+                            meta.data.forEach(function (element, index) {
+                                // Draw the text in black, with the specified font
+                                ctx.fillStyle = 'rgb(0, 0, 0)';
+
+                                var fontSize = 12;
+                                var fontStyle = 'normal';
+                                var fontFamily = 'Helvetica Neue';
+                                ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+                                // Just naively convert to string for now
+                                var dataString = (dataset.data[index] / sums * 100).toFixed(2) +'%';
+
+                                // Make sure alignment settings are correct
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+
+                                var padding = 0;
+                                var position = element.tooltipPosition();
+                                ctx.fillText(dataString, position.x, position.y);
+                                //ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+                            });
+                        }
+                    });
+                }
+            }]
+        });
+        var radarctx = $("#radarChart").get(0).getContext("2d");
+        var myradarChart = new Chart(radarctx, {
+            type: 'radar',
+            data: {
+                labels: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+                datasets: [
+                    {
+                        label: "第一周",
+                        backgroundColor: "rgba(255, 99, 132, 0.2)",
+                        borderColor: "rgba(255, 99, 132, 1)",
+
+                        data: [30, 38, 60, 50, 56, 38, 70]
+                    },
+                    {
+                        label: "第二周",
+                        backgroundColor: "rgba(54, 162, 235, 0.2)",
+                        borderColor: "rgba(54, 162, 235, 1)",
+                        data: [50, 48, 65, 36, 66, 27, 40]
+                    }
+                ]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text: "少吃饭"
+                },
+                legend: {
+                    position: 'right',
+                }
+            }
+        });
+        var ctx = $("#myChart").get(0).getContext("2d");
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ["周一", "周二", "周三", "周四", "周五", "周六","周日"],
+                datasets: [{
+                    label: '每天运动量',
+                    data: [12, 19, 3, 10, 15, 5, 9],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(182, 255, 0, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255,99,132,1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(182, 255, 0, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                title: {
+                    display: true,
+                    text:"少吃点肉"
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            },
+            plugins: [{
+                afterDatasetsDraw: function (chart) {
+                    var ctx = chart.ctx;
+                    chart.data.datasets.forEach(function (dataset, i) {
+                        var meta = chart.getDatasetMeta(i);
+                        if (!meta.hidden) {
+                            meta.data.forEach(function (element, index) {
+                                // Draw the text in black, with the specified font
+                                ctx.fillStyle = 'rgb(0, 0, 0)';
+
+                                var fontSize = 16;
+                                var fontStyle = 'normal';
+                                var fontFamily = 'Helvetica Neue';
+                                ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+                                // Just naively convert to string for now
+                                var dataString = dataset.data[index].toString();
+
+                                // Make sure alignment settings are correct
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+
+                                var padding = 5;
+                                var position = element.tooltipPosition();
+                                ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+                            });
+                        }
+                    });
+                }
+            }]
+        }); 
+        var zxctx = $("#zxChart").get(0).getContext("2d");
+        var zxChar = new Chart(zxctx,{
+            type: 'line',
+            data: {
+                labels: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"],
+                datasets: [
+                    {
+                        label: "第一周",
+                        backgroundColor: "rgba(255, 99, 132, 0.2)",
+                        borderColor: "rgba(255, 99, 132, 1)",
+                    
+                        data: [65, 59, 80, 81, 56, 55, 40]
+                    },
+                    {
+                        label: "第二周",
+                        backgroundColor: "rgba(54, 162, 235, 0.2)",
+                        borderColor: "rgba(54, 162, 235, 1)",                    
+                        data: [28, 48, 40, 19, 86, 27, 90]
+                    }
+                ]
+            },
+            options:{
+                title: {
+                    display: true,
+                    text: "多吃菜"
+                }
+            }
+
+        });
+     
+    </script>
+</body>
+</html>

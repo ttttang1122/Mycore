@@ -1,0 +1,149 @@
+﻿
+@{
+    ViewData["Title"] = "EditIndex";
+    Layout = "~/Views/Share/_Layoutiframe.cshtml";
+}
+
+
+<script>
+    var keyValue = $.request("ids");
+    $(function () {
+
+        if (!!keyValue) {
+            $.ajax({
+                url: "/SuperInfo/GetFormList",
+                data: { ids: keyValue },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $("#form1").formSerialize(data);
+                }
+            });
+        }
+        layui.use(['form', 'layedit', 'laydate'], function () {
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , laydate = layui.laydate;
+
+            form.render();
+
+        });
+    });
+    function submitForm() {
+        $("#form1").validate({
+            rules: {
+                SupName: "required",
+                SupID: "required",
+            }
+        });
+        if ($('#form1').valid()) {
+           $.loading(true, "正在提交数据");
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "/SuperInfo/EditSup/",
+                    data: $('#form1').serialize(),
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.errorMsg) {
+                            top.layer.msg(data.errorMsg, { icon: 2 });
+                        }
+                        else {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            $.currentWindow().$("#list1").trigger("reloadGrid");
+                            var msgs = (data.okMsg);
+                            top.layer.msg(msgs, { icon: 1 });
+                            parent.layer.close(index);
+                        }
+
+                    },
+                    error: function () {
+                        $.loading(false);
+
+                    },
+                    complete: function () {
+                        $.loading(false);
+                    }
+                });
+
+            }, 500);
+        }
+    }
+
+</script>
+<div style="margin-right:30px;padding-top:10px;">
+    <form id="form1" class="layui-form">
+        <div style="position:absolute;">
+            <table class="form">
+                <tr style="display:none;">
+                    <th class="formTitle">序号</th>
+                    <td class="formValue">
+                        <input id="id" name="id" type="text" class="form-control input-sm" readonly="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">客商名称</th>
+                    <td class="formValue">
+                        <input id="SupName" name="SupName" type="text" class="form-control input-sm" />
+                    </td>
+                    <th class="formTitle">客商编号</th>
+                    <td class="formValue">
+                        <input id="SupID" name="SupID" type="text" class="form-control input-sm" />
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <th class="formTitle">客户类别</th>
+                    <td class="formValue">
+                        <select id="SupType" name="SupType" lay-verify="required">
+                            <option value="0">客户</option>
+                            <option value="1">供应商</option>
+                            <option value="2">客商</option>
+                        </select>
+                    </td>
+                    <th class="formTitle">拼音码</th>
+                    <td class="formValue">
+                        <input id="PYM" name="PYM" type="text" class="form-control input-sm" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">地址</th>
+                    <td class="formValue" colspan="3">
+                        <input id="Address" name="Address" type="text" class="form-control input-sm" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <th class="formTitle">负责人</th>
+                    <td class="formValue">
+                        <input id="FZName" name="FZName" type="text" class="form-control input-sm" />
+                    </td>
+                    <th class="formTitle">联系手机</th>
+                    <td class="formValue">
+                        <input id="Phone" name="Phone" type="text" class="form-control input-sm" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <th class="formTitle">微信</th>
+                    <td class="formValue">
+                        <input id="WeiXin" name="WeiXin" type="text" class="form-control input-sm" />
+                    </td>
+                    <th class="formTitle">所属地区</th>
+                    <td class="formValue">
+                        <input id="dq" name="dq" type="text" class="form-control input-sm" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">备注</th>
+                    <td class="formValue" colspan="3">
+                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 60px;"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+

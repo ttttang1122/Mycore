@@ -1,0 +1,155 @@
+﻿
+@{
+    ViewData["Title"] = "EditIndex";
+    Layout = "~/Views/Share/_Layoutiframe.cshtml";
+}
+
+<script>
+    var keyValue = $.request("ids");
+    $(function () {
+     
+        if (!!keyValue) {
+            $.ajax({
+                url: "/GoodsInfo/GetFormList",
+                data: { ids: keyValue },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    $("#form1").formSerialize(data);
+                }
+            });
+        }
+    });
+    function submitForm() {
+        $("#form1").validate({
+            rules: {
+                GoodID: "required",
+                GoodName: "required",
+                DW: "required",
+                ShopPrice: "required",
+            }
+        });
+        if ($('#form1').valid()) {
+           $.loading(true, "正在提交数据");
+            window.setTimeout(function () {
+                $.ajax({
+                    url: "/GoodsInfo/EditGoods/",
+                    data: $('#form1').serialize(),
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.errorMsg) {
+                            top.layer.msg(data.errorMsg, { icon: 2 });
+                        }
+                        else {
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            $.currentWindow().$("#list1").trigger("reloadGrid");
+                            var msgs = (data.okMsg);
+                            top.layer.msg(msgs, { icon: 1 });
+                            parent.layer.close(index);
+                        }
+
+                    },
+                    error: function () {
+                        $.loading(false);
+
+                    },
+                    complete: function () {
+                        $.loading(false);
+                    }
+                });
+
+            }, 500);
+        }
+    }
+
+</script>
+<div style="margin-right:30px;padding-top:10px;">
+    <form id="form1" class="form-horizontal">
+        <div style="position:absolute;">
+            <table class="form">
+                <tr style="display:none;">
+                    <th class="formTitle">序号</th>
+                    <td class="formValue">
+                        <input id="id" name="id" type="text" class="form-control input-sm"  readonly="true" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">商品名称</th>
+                    <td class="formValue">
+                        <input id="GoodName" name="GoodName" type="text" class="form-control input-sm"  readonly="true" />
+                    </td>
+                    <th class="formTitle">商品编号</th>
+                    <td class="formValue">
+                        <input id="GoodID" name="GoodID" type="text" class="form-control input-sm"  />
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <th class="formTitle">别名</th>
+                    <td class="formValue">
+                        <input id="TYName" name="TYName" type="text" class="form-control input-sm"  />
+                    </td>
+                    <th class="formTitle">拼音码</th>
+                    <td class="formValue">
+                        <input id="PYM" name="PYM" type="text" class="form-control input-sm" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">条形码</th>
+                    <td class="formValue">
+                        <input id="TXM" name="TXM" type="text" class="form-control input-sm"  />
+                    </td>
+                    <th class="formTitle">单位</th>
+                    <td class="formValue">
+                        <input id="DW" name="DW" type="text" class="form-control input-sm"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">规格</th>
+                    <td class="formValue">
+                        <input id="GGType" name="GGType" type="text" class="form-control input-sm"/>
+                    </td>
+                    <th class="formTitle">型号</th>
+                    <td class="formValue">
+                        <input id="ModelType" name="ModelType" type="text" class="form-control input-sm" />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">生产厂家</th>
+                    <td class="formValue" colspan="3">
+                        <input id="SCCJ" name="SCCJ" type="text" class="form-control input-sm" />
+                    </td>
+
+                </tr>
+                <tr>
+                    <th class="formTitle">大纲类别</th>
+                    <td class="formValue">
+                        <input id="ClassID" name="ClassID" type="text" class="form-control input-sm"  />
+                    </td>
+                    <th class="formTitle">所属分类</th>
+                    <td class="formValue">
+                        <input id="ForType" name="ForType" type="text" class="form-control input-sm"  />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">许可证</th>
+                    <td class="formValue">
+                        <input id="XKZ" name="XKZ" type="text" class="form-control input-sm" />
+                    </td>
+                    <th class="formTitle">零售价</th>
+                    <td class="formValue">
+                        <input id="ShopPrice" name="ShopPrice" type="number" class="form-control input-sm"  />
+                    </td>
+                </tr>
+                <tr>
+                    <th class="formTitle">备注</th>
+                    <td class="formValue" colspan="3">
+                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 60px;"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>

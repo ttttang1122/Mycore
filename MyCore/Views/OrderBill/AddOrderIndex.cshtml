@@ -1,0 +1,213 @@
+﻿
+@{
+    ViewData["Title"] = "AddOrderIndex";
+    Layout = "~/Views/Share/_LayoutBody.cshtml";
+}
+<style>
+    #bottomField {
+        position: fixed;
+        top: 0;
+        right: 25px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 0px 0px 6px 6px;
+        padding: 10px;
+    }
+
+   #bottomField .btn-group {
+            font-size: 14px;
+            margin-top: -1px;
+            vertical-align: middle;
+            color: #666666;
+        }
+    .layui-form-label {
+        width: 80px;
+        padding: 2px 10px 0px 0px;
+    }
+    .ui-jqgrid .ui-jqgrid-btable tbody tr.jqgrow td {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        line-height: 20px;
+    }
+    /*.layui-btn-xs {
+        height: 20px;
+        line-height: 20px;
+    }
+    .form-control {
+        height: 20px;
+    }
+    .layui-btn-xs {
+        height: 20px;
+        line-height: 20px;
+    }*/
+</style>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-xs12">
+            <div class="layui-card">
+                <div class="layui-card-body" style=" height:610px; margin-bottom:20px;box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);">
+                    <form class="layui-form">
+                        <div class="layui-form-item" style="margin-bottom:5px">
+                            <label class="layui-form-label">单据日期</label>
+                            <div class="layui-input-inline" style="width:100px">
+                                <input type="text" name="BillDate" class="layui-input" id="BillDate">
+                            </div>
+                            <label class="layui-form-label">采购员</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <select id="CGName" name="CGName" lay-verify="required">
+                                    <option value="">==请选择==</option>
+                                </select>
+                            </div>
+                            <label class="layui-form-label">供应商</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <select id="SupName" name="SupName" lay-verify="required">
+                                    <option value="">==请选择==</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-inline">
+                                <input type="text" id="BZ" name="BZ" required lay-verify="required" autocomplete="off" class="layui-input" style="width:560px;">
+                            </div>
+
+                        </div>
+                    </form>
+
+                    <table id="list1" class="table table-condensed"></table>
+                  
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="bottomField">
+    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="SaveAdd" id="SaveAdd"><i class="layui-icon">&#xe61f;</i>保存并新增</button>
+    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Add" id="Add"><i class="layui-icon ">&#xe601;</i>保存</button>
+</div>
+
+<script>
+    layui.use(['table', 'form', 'layedit', 'laydate'], function () {
+        var strdate = new Date().Format("yyyy-MM-dd");
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , laydate = layui.laydate
+            , table = layui.table;
+        laydate.render({
+            elem: '#BillDate',//制定元素
+            type: 'date',
+            show: false,//默认显示
+            position: 'fixed',
+            value: strdate,
+            isInitValue: true, //是否允许填充初始值，默认为 true
+           
+        });
+      
+        $("#CGName").bindSelect({
+            url: "/OrderBill/GetUser",
+            id: "id",
+            text: "UserName"
+        });
+        $("#SupName").bindSelect({
+            url: "/OrderBill/GetSup",
+            id: "id",
+            text: "SupName"
+        });
+
+        form.render();
+       
+    });
+      $(function () {
+        $("#list1").jqGrid({
+            styleUI: 'Bootstrap',
+            datatype: "local",
+            jsonReader: {
+                repeatitems: false
+            },
+            colModel: [
+                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true },
+                {
+                    label: '操作', name: 'Hand', index: 'Hand', width: 100, align: 'center', formatter: function (value, grid, rows, state) {
+                        var detail = ' <button onclick="AddRow(\'' + rows.id + '\');" class="layui-btn layui-btn-xs" lay-event="AddInvoice">新增</button> <button onclick="DelRow(\'' + rows.id + '\');" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="DelInvoice">删除</button>';
+                        return detail;
+                    }
+                },
+                { label: '商品id', name: 'Good_id', index: 'Good_id', width: 100, align: 'center', hidden: true},
+                { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 100, align: 'center', hidden: true },
+                { label: '商品名称', name: 'GoodName', index: 'GoodName', width:140, align: 'center'},
+                { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
+                { label: '规格', name: 'GGType', index: 'GGType', width: 100, align: 'center' },
+                { label: '型号', name: 'ModelType', index: 'ModelType', width: 100, align: 'center' },
+                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 100, align: 'center' },
+                { label: '单价', name: 'Price', index: 'Price', width: 100, align: 'center', editable: true },
+                { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center', editable: true},
+                { label: '金额', name: 'Sum', index: 'Sum', width: 100, align: 'center' },
+                { label: '备注', name: 'BZ', index: 'BZ', width: 140, align: 'center', editable: true },
+
+            ],
+            width: "100%",
+            autowidth: true,
+            height: 485,
+            sortname: 'id',//初始化的时候排序的字段
+            sortorder: "desc",//排序方式,可选desc,asc
+            //mtype: "post",//向后台请求数据的ajax的类型。可选post,get
+            viewrecords: true,
+            shrinkToFit: false,
+            rownumbers: true,
+            cellEdit: true,
+            cellsubmit: 'clientArray',
+          });
+
+          for (var i = 1; i <= 15; i++) {
+              var item = {
+                  "id": i,
+                  "Good_id": '',
+                  "GoodID": '',
+                  "GoodName": '',
+                  "DW": '',
+                  "GGType": '',
+                  "ModelType": '',
+                  "SCCJ": '',
+                  "Price": '',
+                  "Num": '',
+                  "Sum": '',
+                  "BZ": ''
+              };
+              $("#list1").jqGrid("addRowData", i, item, "last"); 
+          }
+
+    });
+  
+          
+    
+    function AddRow(ids) {
+
+        layer.msg(ids +"新增", { icon: 2 });
+    }
+    function DelRow(ids) {
+        layer.msg(ids +"删除", { icon: 2 });
+
+    }
+    $(function (){
+        $.hands = {
+            SaveAdd: function () {
+
+            },
+            Add: function () {
+
+            },
+
+            init:function() {
+                $('#SaveAdd').on('click', $.hands.SaveAdd);
+                $('#Add').on('click', $.hands.Add);
+
+            }
+        }
+        $(function () {
+            $.hands.init();
+        });
+    });
+
+</script>
+
