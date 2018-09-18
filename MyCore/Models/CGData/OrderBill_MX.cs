@@ -13,7 +13,7 @@ namespace MyCore.Models.CGData
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         /// <summary>
-        /// 单据编号
+        /// 主表主键
         /// </summary>
         public int Bill_id { get; set; }
         /// <summary>

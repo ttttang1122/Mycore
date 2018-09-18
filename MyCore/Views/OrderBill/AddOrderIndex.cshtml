@@ -53,13 +53,13 @@
                             </div>
                             <label class="layui-form-label">采购员</label>
                             <div class="layui-input-inline" style="width:140px">
-                                <select id="CGName" name="CGName" lay-verify="required">
+                                <select id="CGName" name="CGName" lay-search lay-verify="required">
                                     <option value="">==请选择==</option>
                                 </select>
                             </div>
                             <label class="layui-form-label">供应商</label>
                             <div class="layui-input-inline" style="width:140px">
-                                <select id="SupName" name="SupName" lay-verify="required">
+                                <select id="SupName" name="SupName" lay-search lay-verify="required">
                                     <option value="">==请选择==</option>
                                 </select>
                             </div>
@@ -73,9 +73,7 @@
                         </div>
                     </form>
 
-                    <table id="list1" class="table table-condensed"></table>
-                  
-
+                    <table id="list1" class="table table-condensed"></table>                
                 </div>
             </div>
         </div>
@@ -87,6 +85,9 @@
 </div>
 
 <script>
+    var lastrow;  //最后修改行号先定义一个全局变量
+    var lastcell; //最后修改列号先定义一个全局变量
+    //初始化界面
     layui.use(['table', 'form', 'layedit', 'laydate'], function () {
         var strdate = new Date().Format("yyyy-MM-dd");
         var form = layui.form
@@ -103,12 +104,13 @@
             isInitValue: true, //是否允许填充初始值，默认为 true
            
         });
-      
+        //采购员
         $("#CGName").bindSelect({
             url: "/OrderBill/GetUser",
             id: "id",
             text: "UserName"
         });
+        //供应商
         $("#SupName").bindSelect({
             url: "/OrderBill/GetSup",
             id: "id",
@@ -118,7 +120,7 @@
         form.render();
        
     });
-      $(function () {
+    $(function () {
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
             datatype: "local",
@@ -126,10 +128,10 @@
                 repeatitems: false
             },
             colModel: [
-                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true },
+                { label: 'ids', name: 'ids', index: 'ids', key: true, width: 75, hidden: true },
                 {
                     label: '操作', name: 'Hand', index: 'Hand', width: 100, align: 'center', formatter: function (value, grid, rows, state) {
-                        var detail = ' <button onclick="AddRow(\'' + rows.id + '\');" class="layui-btn layui-btn-xs" lay-event="AddInvoice">新增</button> <button onclick="DelRow(\'' + rows.id + '\');" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="DelInvoice">删除</button>';
+                        var detail = ' <button onclick="AddGoods(\'' + rows.ids + '\');" class="layui-btn layui-btn-xs" lay-event="AddInvoice">新增</button> <button onclick="DelRow(\'' + rows.ids + '\');" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="DelInvoice">删除</button>';
                         return detail;
                     }
                 },
@@ -149,7 +151,7 @@
             width: "100%",
             autowidth: true,
             height: 485,
-            sortname: 'id',//初始化的时候排序的字段
+            sortname: 'ID',//初始化的时候排序的字段
             sortorder: "desc",//排序方式,可选desc,asc
             //mtype: "post",//向后台请求数据的ajax的类型。可选post,get
             viewrecords: true,
@@ -157,11 +159,16 @@
             rownumbers: true,
             cellEdit: true,
             cellsubmit: 'clientArray',
-          });
+            beforeEditCell: function (rowid, cellname, v, iRow, iCol) {
+                lastrow = iRow;  //给全局变量赋值
+                lastcell = iCol;
+            }
 
+          });
+          //填充15行空行
           for (var i = 1; i <= 15; i++) {
               var item = {
-                  "id": i,
+                  "ids": i,
                   "Good_id": '',
                   "GoodID": '',
                   "GoodName": '',
@@ -180,14 +187,37 @@
     });
   
           
-    
-    function AddRow(ids) {
-
-        layer.msg(ids +"新增", { icon: 2 });
+    //选择商品弹出框
+    function AddGoods(ids) {
+        var url = "/OrderBill/AddRowIndex" + "?ids=" + ids ;
+        $.FromOpen('OrderBillFromAddRow', '选择商品信息', url, '600px', '500px', '1000');
     }
+    //填充一行商品信息
+    function AddRow(item) {
+        $("#list1").jqGrid('setCell', item.ids, 'Good_id', item.Good_id);
+        $("#list1").jqGrid('setCell', item.ids, 'GoodID', item.GoodID);
+        $("#list1").jqGrid('setCell', item.ids, 'GoodName', item.GoodName);
+        $("#list1").jqGrid('setCell', item.ids, 'DW', item.DW);
+        $("#list1").jqGrid('setCell', item.ids, 'GGType', item.GGType);
+        $("#list1").jqGrid('setCell', item.ids, 'ModelType', item.ModelType);
+        $("#list1").jqGrid('setCell', item.ids, 'SCCJ', item.SCCJ);
+        $("#list1").jqGrid('setCell', item.ids, 'Price', 0);
+        $("#list1").jqGrid('setCell', item.ids, 'Num', 1);
+        $("#list1").jqGrid('setCell', item.ids, 'Sum', 0);
+    }
+    //删除一行商品信息
     function DelRow(ids) {
-        layer.msg(ids +"删除", { icon: 2 });
-
+        $("#list1").jqGrid('setCell', ids, 'Good_id', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'GoodID', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'GoodName', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'DW', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'GGType', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'ModelType', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'SCCJ', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'Price', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'Num', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'Sum', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'BZ', "&nbsp");
     }
     $(function (){
         $.hands = {
@@ -195,6 +225,84 @@
 
             },
             Add: function () {
+                $('#list1').jqGrid("saveCell", lastrow, lastcell);
+                //选择日期判断
+                var BillDate = $('#BillDate').val();
+                if (BillDate == "" || BillDate == undefined || BillDate == null) {
+                    layer.msg("请选择日期", { icon: 2 });
+                    return false;
+                }
+                //选择采购员判断
+                var CGNameID = $('#CGName').val();
+                if (CGNameID == "" || CGNameID == undefined || CGNameID == null) {
+                    layer.msg("请选择采购员", { icon: 2 });
+                    return false;
+                }
+                var CGName = $("#CGName option:selected").text();
+                //选择供应商判断
+                var Sup_id = $('#SupName').val();
+                if (Sup_id == "" || Sup_id == undefined || Sup_id == null) {
+                    layer.msg("请选择供应商", { icon: 2 });
+                    return false;
+                }
+                var SupName = $("#SupName option:selected").text();
+
+                var BZ = $('#BZ').val();
+                var AddData = [];
+                var datas = $("#list1").jqGrid("getRowData"); 
+                $.each(datas, function (i) {
+                    var row = datas[i];
+                    if (row.GoodName != "" && row.GoodName != undefined && row.GoodName != null) {
+                        AddData.push(row);
+                    }
+                });
+                if (AddData.length > 0) {
+                    var Bill = {
+                        "BillDate": BillDate,
+                        "CGNameID": CGNameID,
+                        "CGName": CGName,
+                        "Sup_id": Sup_id,
+                        "SupName": SupName,
+                        "BZ": BZ
+                    };
+                    var flag = false;
+                    $.loading(true, "正在提交数据");
+                    $.ajax({
+                        url: "/OrderBill/SaveOrderBill",
+                        data: { OrderBiils: Bill, OrderBiils_MX: AddData },
+                        dataType: "json",
+                        type: "post",
+                        async: false,
+                        success: function (data) {
+                            $.loading(false);
+                            if (data.errorMsg) {
+                                flag = false;
+                                top.layer.msg(data.errorMsg, { icon: 2 });
+
+                            }
+                            else {
+                                var msgs = (data.okMsg);
+                                flag = true;
+                                top.layer.msg(msgs, { icon: 1 });
+
+                            }
+                        },
+                        error: function () {
+                            $.loading(false);
+
+
+                        },
+                        complete: function () {
+                            $.loading(false);
+
+                        }
+                    });
+                    return flag;
+                }
+                else {
+                    layer.msg("请输入商品信息", { icon: 2 });
+                    return false;
+                }
 
             },
 
@@ -208,6 +316,43 @@
             $.hands.init();
         });
     });
+    //计算单价 数量 金额
+    $(document).on('keyup', '#list1>tbody>tr>td>input[type="text"]', function () {
+        var _inputName = $(this).attr('name');
+
+        if (_inputName == "Price") {
+            var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+            var rowData = $("#list1").jqGrid("getRowData", id);
+            var _price = Number($(this).val());
+            if (isNaN(_price)) {
+                _price = 0;
+            }
+            var _num = Number(rowData.Num);
+            var _sum = _price * _num;
+            $("#list1").jqGrid('setCell', id, 'Sum', _sum);
+
+
+        } else if (_inputName == "Num") {
+            var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+            var rowData = $("#list1").jqGrid("getRowData", id);
+            var _price = Number(rowData.Price);
+            var _num = Number($(this).val());
+            if (isNaN(_num)) {
+                _num = 0;
+            }
+            var _sum = _price * _num;
+            $("#list1").jqGrid('setCell', id, 'Sum', _sum);
+
+        }
+    });
+  
 
 </script>
-
+<style>
+    .form-control {
+        height: 20px;
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle
+    }
+</style>

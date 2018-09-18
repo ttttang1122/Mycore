@@ -22,9 +22,9 @@ namespace MyCore.Models.CGData
         /// </summary>
         public DateTime? BillDate { get; set; }
         /// <summary>
-        /// 制单人ID
+        /// 制单人日期
         /// </summary>
-        public int CreateNameID { get; set; }
+        public DateTime? CreateDate { get; set; }
         /// <summary>
         /// 制单人
         /// </summary>
@@ -54,7 +54,7 @@ namespace MyCore.Models.CGData
         [StringLength(200)]
         public string BZ { get; set; }
         /// <summary>
-        /// 完成状态
+        /// 完成状态 0未完成  1已完成
         /// </summary>
         public int? Status { get; set; }
         /// <summary>
