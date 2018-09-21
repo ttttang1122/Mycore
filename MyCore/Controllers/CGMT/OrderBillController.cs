@@ -63,12 +63,15 @@ namespace MyCore.Controllers.CGGL
         [HttpPost]
         public async Task<IActionResult> OrderBill_MXList(string sidx, string sord, int page, int rows, int id)
         {
-
-            var bills = await conn.OrderBill_MX.Where(b=>b.Bill_id==id).ToListAsync();   
+            var bills = await conn.OrderBill_MX.Where(b=>b.Bill_id==id).ToListAsync();           
             return bills.GetJson<OrderBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<OrderBill_MX>());
 
         }
         public IActionResult AddOrderIndex()
+        {
+            return View();
+        }
+        public IActionResult EditOrderIndex()
         {
             return View();
         }
@@ -143,8 +146,6 @@ namespace MyCore.Controllers.CGGL
             OrderBiils.CreateDate = DateTime.Now;
             OrderBiils.Status =0;
             OrderBiils.SHStatus = 0;
-            OrderBiils.SHName= UserID;
-            OrderBiils.SHDate= DateTime.Now;
             OrderBiils.OrderBill_MX = OrderBiils_MX;
             foreach (var item in OrderBiils_MX)
                 {
@@ -166,6 +167,77 @@ namespace MyCore.Controllers.CGGL
                 var json = new
                 {
                     okMsg = "保存成功！"
+                };
+                return Json(json);
+            }
+            catch (Exception ex)
+            {
+                var json = new
+                {
+                    errorMsg = ex.ToString()
+                };
+                return Json(json);
+            }
+
+
+        }
+
+        public async Task<IActionResult> GetBillList(int ids)
+        {
+            var orderBills = await conn.OrderBill.FirstOrDefaultAsync(b=>b.id==ids);
+            conn.Entry(orderBills).Collection(p => p.OrderBill_MX).Query().Load();
+           
+
+            var data = new
+            {
+                bills = orderBills
+            };
+            return Json(data);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditOrderBill(int id, OrderBill OrderBiils, List<OrderBill_MX> OrderBiils_MX)
+        {
+            if (OrderBiils == null)
+            {
+                var jsons = new
+                {
+                    errorMsg = "修改失败,无数据!"
+                };
+                return Json(jsons);
+            }
+            var editBills = await conn.OrderBill.FirstOrDefaultAsync(b=>b.id==id);
+            var editBill_mx = conn.OrderBill_MX.Where(b => b.Bill_id == id);
+            foreach (var item in editBill_mx)
+            {
+                conn.OrderBill_MX.Remove(item);
+            }
+            string UserID = HttpContext.Session.GetString("UserID");
+            DateTime now = DateTime.Now;
+            editBills.BillDate = OrderBiils.BillDate;
+            editBills.CGName = OrderBiils.CGName;
+            editBills.CGNameID = OrderBiils.CGNameID;
+            editBills.SupName = OrderBiils.SupName;
+            editBills.Sup_id = OrderBiils.Sup_id;
+            editBills.BZ = OrderBiils.BZ;
+            editBills.OrderBill_MX = OrderBiils_MX;
+            foreach (var item in OrderBiils_MX)
+            {
+                if (item.Num == 0)
+                {
+                    var json = new
+                    {
+                        errorMsg = "修改失败," + item.GoodName + " 请输入数量!"
+                    };
+                    return Json(json);
+                }
+            }
+            try
+            {
+                await conn.SaveChangesAsync();
+                var json = new
+                {
+                    okMsg = "修改成功！"
                 };
                 return Json(json);
             }

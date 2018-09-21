@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
+using Newtonsoft.Json;
 
 namespace MyCore.Models.CGData
 {
@@ -77,6 +79,8 @@ namespace MyCore.Models.CGData
         [StringLength(200)]
         public string BZ { get; set; }
 
+        [JsonIgnore]
+        [IgnoreDataMember]
         [ForeignKey("Bill_id")]
         public virtual OrderBill OrderBill { get; set; }
 

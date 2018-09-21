@@ -191,8 +191,12 @@
                     layer.msg("请选择一行", { icon: 2 });
                     return;
                 }
-                var url = "/StoreInfo/EditIndex" + "?ids=" + ids;
-                $.FromOpen('StoreFromEdit', '修改仓库', url, '600px', '350px', '1000');
+                var url = "/OrderBill/EditOrderIndex" + "?ids=" + ids;
+                if (top.layui.index) {
+                    top.layui.index.openTabsPage(url, "修改订单")
+                } else {
+                    window.open('/OrderBill/EditOrderIndex')
+                }     
 
             },
             Del: function () {

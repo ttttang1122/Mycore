@@ -1,8 +1,9 @@
 ﻿
 @{
-    ViewData["Title"] = "AddOrderIndex";
+    ViewData["Title"] = "EditOrderIndex";
     Layout = "~/Views/Share/_LayoutBody.cshtml";
 }
+
 <style>
     #bottomField {
         position: fixed;
@@ -12,8 +13,7 @@
         border-radius: 0px 0px 6px 6px;
         padding: 10px;
     }
-
-   #bottomField .btn-group {
+    #bottomField .btn-group {
             font-size: 14px;
             margin-top: -1px;
             vertical-align: middle;
@@ -73,53 +73,21 @@
                         </div>
                     </form>
 
-                    <table id="list1" class="table table-condensed"></table>                
+                    <table id="list1" class="table table-condensed"></table>
                 </div>
             </div>
         </div>
     </div>
 </div>
 <div id="bottomField">
-    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="SaveAdd" id="SaveAdd"><i class="layui-icon">&#xe61f;</i>保存并新增</button>
-    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Add" id="Add"><i class="layui-icon ">&#xe601;</i>保存</button>
+    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Add" id="Add"><i class="layui-icon ">&#xe601;</i>修改保存</button>
 </div>
 
 <script>
+    var keyValue = $.request("ids");
     var lastrow;  //最后修改行号先定义一个全局变量
     var lastcell; //最后修改列号先定义一个全局变量
-    //初始化界面
-    layui.use(['table', 'form', 'layedit', 'laydate'], function () {
-        var strdate = new Date().Format("yyyy-MM-dd");
-        var form = layui.form
-            , layer = layui.layer
-            , layedit = layui.layedit
-            , laydate = layui.laydate
-            , table = layui.table;
-        laydate.render({
-            elem: '#BillDate',//制定元素
-            type: 'date',
-            show: false,//默认显示
-            position: 'fixed',
-            value: strdate,
-            isInitValue: true, //是否允许填充初始值，默认为 true
-           
-        });
-        //采购员
-        $("#CGName").bindSelect({
-            url: "/OrderBill/GetUser",
-            id: "id",
-            text: "UserName"
-        });
-        //供应商
-        $("#SupName").bindSelect({
-            url: "/OrderBill/GetSup",
-            id: "id",
-            text: "SupName"
-        });
-
-        form.render();
-       
-    });
+    //初始化界面  
     $(function () {
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
@@ -181,12 +149,94 @@
                   "Sum": '',
                   "BZ": ''
               };
-              $("#list1").jqGrid("addRowData", i, item, "last"); 
+              $("#list1").jqGrid("addRowData", i, item, "last");
           }
+        layui.use(['table', 'form', 'layedit', 'laydate'], function () {
+            var strdate = new Date().Format("yyyy-MM-dd");
+            //采购员
+            $("#CGName").bindSelect({
+                url: "/OrderBill/GetUser",
+                id: "id",
+                text: "UserName"
+            });
+            //供应商
+            $("#SupName").bindSelect({
+                url: "/OrderBill/GetSup",
+                id: "id",
+                text: "SupName"
+            });
 
-    });
-  
-          
+            if (!!keyValue) {
+                $.ajax({
+                    url: "/OrderBill/GetBillList",
+                    data: { ids: keyValue },
+                    dataType: "json",
+                    async: false,
+                    success: function (datas) {
+                        var orderbill = datas.bills;
+                        var orderbill_mx = datas.bills.orderBill_MX;
+                        $("#CGName").val(orderbill.cgNameID);
+                        $("#SupName").val(orderbill.sup_id);
+                        var BillDates = orderbill.billDate.toString().substring(0, 10);
+                        $("#BillDate").val(BillDates);
+                        $("#BZ").val(orderbill.bz);
+                        $.each(orderbill_mx, function (i) {
+                            var item = {
+                                "Good_id": orderbill_mx[i].good_id,
+                                "GoodID": orderbill_mx[i].goodID,
+                                "GoodName": orderbill_mx[i].goodName,
+                                "DW": orderbill_mx[i].dw,
+                                "GGType": orderbill_mx[i].ggType,
+                                "ModelType": orderbill_mx[i].modelType,
+                                "SCCJ": orderbill_mx[i].sccj,
+                                "Price": orderbill_mx[i].price,
+                                "Num": orderbill_mx[i].num,
+                                "Sum": orderbill_mx[i].sum,
+                                "BZ": orderbill_mx[i].bz,
+                            };
+                            EditAddRow(i + 1, item);
+
+                        });
+
+
+                    }
+                });
+            }
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , laydate = layui.laydate
+                , table = layui.table;
+            laydate.render({
+                elem: '#BillDate',//制定元素
+                type: 'date',
+                show: false,//默认显示
+                position: 'fixed',
+                //value: strdate,
+                //isInitValue: true, //是否允许填充初始值，默认为 true
+
+            });
+
+            form.render();
+
+        });
+
+    }); 
+    //加载明细表方法之一
+    function EditAddRow(ids,item) {
+        $("#list1").jqGrid('setCell', ids, 'Good_id', item.Good_id);
+        $("#list1").jqGrid('setCell', ids, 'GoodID', item.GoodID);
+        $("#list1").jqGrid('setCell', ids, 'GoodName', item.GoodName);
+        $("#list1").jqGrid('setCell', ids, 'DW', item.DW);
+        $("#list1").jqGrid('setCell', ids, 'GGType', item.GGType);
+        $("#list1").jqGrid('setCell', ids, 'ModelType', item.ModelType);
+        $("#list1").jqGrid('setCell', ids, 'SCCJ', item.SCCJ);
+        $("#list1").jqGrid('setCell', ids, 'Price', item.Price);
+        $("#list1").jqGrid('setCell', ids, 'Num', item.Num);
+        $("#list1").jqGrid('setCell', ids, 'Sum', item.Sum);
+        $("#list1").jqGrid('setCell', ids, 'BZ', item.BZ);
+
+    }
     //选择商品弹出框
     function AddGoods(ids) {
         var url = "/OrderBill/AddRowIndex" + "?ids=" + ids ;
@@ -220,16 +270,7 @@
         $("#list1").jqGrid('setCell', ids, 'BZ', "&nbsp");
     }
     $(function (){
-        $.hands = {
-            SaveAdd: function () {
-                var flag = $.hands.Add();
-                if (flag) {
-                    var rowdata = [];
-                    for (var i = 1; i <= 15; i++) {
-                        DelRow(i);
-                    } 
-                };
-            },
+        $.hands = {          
             AddClose: function () {
                 var flag = $.hands.Add();
                 if (flag) {
@@ -262,7 +303,7 @@
 
                 var BZ = $('#BZ').val();
                 var AddData = [];
-                var datas = $("#list1").jqGrid("getRowData"); 
+                var datas = $("#list1").jqGrid("getRowData");
                 $.each(datas, function (i) {
                     var row = datas[i];
                     if (row.GoodName != "" && row.GoodName != undefined && row.GoodName != null) {
@@ -281,8 +322,8 @@
                     var flag = false;
                     $.loading(true, "正在提交数据");
                     $.ajax({
-                        url: "/OrderBill/SaveOrderBill",
-                        data: { OrderBiils: Bill, OrderBiils_MX: AddData },
+                        url: "/OrderBill/EditOrderBill",
+                        data: { id: keyValue, OrderBiils: Bill, OrderBiils_MX: AddData },
                         dataType: "json",
                         type: "post",
                         async: false,
@@ -320,7 +361,6 @@
             },
 
             init:function() {
-                $('#SaveAdd').on('click', $.hands.SaveAdd);
                 $('#Add').on('click', $.hands.AddClose);
 
             }
@@ -358,7 +398,7 @@
 
         }
     });
-  
+
 
 </script>
 <style>
@@ -369,3 +409,5 @@
         vertical-align: middle
     }
 </style>
+
+
