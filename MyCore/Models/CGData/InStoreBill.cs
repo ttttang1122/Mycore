@@ -4,13 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-
 namespace MyCore.Models.CGData
 {
-    public class OrderBill
+    public class InStoreBill
     {
         /// <summary>
-        /// 采购订单编号
+        /// 入库订单编号
         /// </summary>
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -34,14 +33,14 @@ namespace MyCore.Models.CGData
         [StringLength(45)]
         public string CreateName { get; set; }
         /// <summary>
-        /// 采购员ID
+        /// 验收ID
         /// </summary>
-        public int CGNameID { get; set; }
+        public int YSNameID { get; set; }
         /// <summary>
-        /// 采购员
+        /// 验收员
         /// </summary>
         [StringLength(45)]
-        public string  CGName { get; set; }
+        public string YSName { get; set; }
         /// <summary>
         /// 供应商id
         /// </summary>
@@ -52,14 +51,14 @@ namespace MyCore.Models.CGData
         [StringLength(145)]
         public string SupName { get; set; }
         /// <summary>
+        /// 总金额
+        /// </summary>
+        public decimal? Sum { get; set; }
+        /// <summary>
         /// 备注
         /// </summary>
         [StringLength(200)]
         public string BZ { get; set; }
-        /// <summary>
-        /// 完成状态 0未完成  1已完成
-        /// </summary>
-        public int? Status { get; set; }
         /// <summary>
         /// 审核状态 0未审核 1已审核
         /// </summary>
@@ -73,8 +72,16 @@ namespace MyCore.Models.CGData
         /// </summary>
         [StringLength(45)]
         public string SHName { get; set; }
+        /// <summary>
+        /// 关联订单号id
+        /// </summary>
+        public int? OrderBill_id { get; set; }
+        /// <summary>
+        /// 关联订单号单据编号
+        /// </summary>
+        [StringLength(45)]
+        public string OrderBillID{ get; set; }
 
-        public virtual List<OrderBill_MX> OrderBill_MX { get; set; }
-
+        public virtual List<InStoreBill_MX> InStoreBill_MX { get; set; }
     }
 }

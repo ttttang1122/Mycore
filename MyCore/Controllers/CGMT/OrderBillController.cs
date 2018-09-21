@@ -185,9 +185,7 @@ namespace MyCore.Controllers.CGGL
         public async Task<IActionResult> GetBillList(int ids)
         {
             var orderBills = await conn.OrderBill.FirstOrDefaultAsync(b=>b.id==ids);
-            conn.Entry(orderBills).Collection(p => p.OrderBill_MX).Query().Load();
-           
-
+            conn.Entry(orderBills).Collection(p => p.OrderBill_MX).Query().Load();         
             var data = new
             {
                 bills = orderBills
@@ -207,6 +205,16 @@ namespace MyCore.Controllers.CGGL
                 return Json(jsons);
             }
             var editBills = await conn.OrderBill.FirstOrDefaultAsync(b=>b.id==id);
+
+            if (editBills.SHStatus == 1)
+            {
+                var jsons = new
+                {
+                    errorMsg = "修改失败,单据已审核!"
+                };
+                return Json(jsons);
+            }
+
             var editBill_mx = conn.OrderBill_MX.Where(b => b.Bill_id == id);
             foreach (var item in editBill_mx)
             {
@@ -251,6 +259,159 @@ namespace MyCore.Controllers.CGGL
             }
 
 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteBill(int ids)
+        {
+
+            var orderBills = await conn.OrderBill.FirstOrDefaultAsync(b => b.id == ids);
+            conn.Entry(orderBills).Collection(p => p.OrderBill_MX).Query().Load();
+            if (orderBills.SHStatus == 1)
+            {
+                var jsons = new
+                {
+                    errorMsg = "删除失败,单据已审核!"
+                };
+                return Json(jsons);
+            }
+            conn.Remove(orderBills);
+
+            try
+            {
+                await conn.SaveChangesAsync();
+                var json = new
+                {
+                    okMsg = "删除成功！"
+                };
+                return Json(json);
+            }
+            catch (Exception ex)
+            {
+                var json = new
+                {
+                    errorMsg = ex.ToString()
+                };
+                return Json(json);
+            }
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> SHBill(int ids)
+        {
+
+            var orderBills = await conn.OrderBill.FirstOrDefaultAsync(b => b.id == ids);
+            if (orderBills.SHStatus == 1)
+            {
+                var jsons = new
+                {
+                    errorMsg = "审核失败,单据已审核!"
+                };
+                return Json(jsons);
+            }
+            string UserID = HttpContext.Session.GetString("UserID");
+            DateTime now = DateTime.Now;
+            orderBills.SHStatus = 1;
+            orderBills.SHName = UserID;
+            orderBills.SHDate = now;
+            try
+            {
+                await conn.SaveChangesAsync();
+                var json = new
+                {
+                    okMsg = "审核成功！"
+                };
+                return Json(json);
+            }
+            catch (Exception ex)
+            {
+                var json = new
+                {
+                    errorMsg = ex.ToString()
+                };
+                return Json(json);
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> NOSHBill(int ids)
+        {
+
+            var orderBills = await conn.OrderBill.FirstOrDefaultAsync(b => b.id == ids);
+            if (orderBills.SHStatus == 0)
+            {
+                var jsons = new
+                {
+                    errorMsg = "审核失败,单据未审核不可反审核!"
+                };
+                return Json(jsons);
+            }
+            string UserID = HttpContext.Session.GetString("UserID");
+            DateTime now = DateTime.Now;
+            orderBills.SHStatus = 0;
+            orderBills.SHName = string.Empty;
+            orderBills.SHDate = DateTime.MinValue;
+            try
+            {
+                await conn.SaveChangesAsync();
+                var json = new
+                {
+                    okMsg = "反审核成功！"
+                };
+                return Json(json);
+            }
+            catch (Exception ex)
+            {
+                var json = new
+                {
+                    errorMsg = ex.ToString()
+                };
+                return Json(json);
+            }
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetFile(string StrSearchType, string StrSearch)
+        {
+
+            IQueryable<OrderBill> bills = conn.OrderBill;
+
+            if (!string.IsNullOrWhiteSpace(StrSearchType))
+            {
+                if (!string.IsNullOrWhiteSpace(StrSearch))
+                {
+                    switch (StrSearchType)
+                    {
+                        case "0":
+                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
+                            break;
+                        case "1":
+                            bills = bills.Where(b => b.CGName.Contains(StrSearch));
+
+                            break;
+                        case "2":
+                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
+
+                            break;
+                        default:
+
+                            break;
+                    }
+
+                }
+            }
+
+            var lists = await bills.ToListAsync();
+
+
+            byte[] buffer = ExcelHelp.Export<OrderBill>(lists, "采购订单", "采购订单", SysTool.GetPropertyNameArray<OrderBill>()).GetBuffer();
+
+
+            var fileName = "采购订单" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+
+            return File(buffer, "application/vnd.ms-excel", fileName);
         }
 
     }
