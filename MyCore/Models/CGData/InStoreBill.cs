@@ -81,7 +81,7 @@ namespace MyCore.Models.CGData
         /// </summary>
         [StringLength(45)]
         public string OrderBillID{ get; set; }
-
+   
         public virtual List<InStoreBill_MX> InStoreBill_MX { get; set; }
     }
 }

@@ -128,7 +128,7 @@ namespace MyCore.Controllers.CGGL
 
 
         [HttpPost]
-        public async Task<IActionResult> SaveOrderBill(OrderBill OrderBiils, List<OrderBill_MX> OrderBiils_MX)
+        public async Task<IActionResult> SaveOrderBill(string SHTypes, OrderBill OrderBiils, List<OrderBill_MX> OrderBiils_MX)
         {
             if (OrderBiils == null)
             {
@@ -147,6 +147,13 @@ namespace MyCore.Controllers.CGGL
             OrderBiils.Status =0;
             OrderBiils.SHStatus = 0;
             OrderBiils.OrderBill_MX = OrderBiils_MX;
+            if (SHTypes =="yes")
+            {
+                OrderBiils.SHStatus = 1;
+                OrderBiils.SHName = UserID;
+                OrderBiils.SHDate = now;
+            }
+
             foreach (var item in OrderBiils_MX)
                 {
                     if (item.Num == 0)

@@ -67,7 +67,7 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">备注</label>
                             <div class="layui-input-inline">
-                                <input type="text" id="BZ" name="BZ" required lay-verify="required" autocomplete="off" class="layui-input" style="width:560px;">
+                                <input type="text" id="BZ" name="BZ"  class="layui-input" style="width:560px;">
                             </div>
 
                         </div>
@@ -81,7 +81,8 @@
 </div>
 <div id="bottomField">
     <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="SaveAdd" id="SaveAdd"><i class="layui-icon">&#xe61f;</i>保存并新增</button>
-    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Add" id="Add"><i class="layui-icon ">&#xe601;</i>保存</button>
+    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Add" id="Add"><i class="layui-icon ">&#xe608;</i>保存</button>
+    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="AddSH" id="AddSH"><i class="layui-icon ">&#xe672;</i>保存并审核</button>
 </div>
 
 <script>
@@ -222,7 +223,8 @@
     $(function (){
         $.hands = {
             SaveAdd: function () {
-                var flag = $.hands.Add();
+                var types = "no";
+                var flag = $.hands.Add(types);
                 if (flag) {
                     var rowdata = [];
                     for (var i = 1; i <= 15; i++) {
@@ -231,13 +233,21 @@
                 };
             },
             AddClose: function () {
-                var flag = $.hands.Add();
+                var types = "no";
+                var flag = $.hands.Add(types);
                 if (flag) {
                     top.$("#LAY_app_tabsheader").children(".layui-this").children(".layui-tab-close").trigger("click");
                 };
 
             },
-            Add: function () {
+            AddSH: function () {
+                var types = "yes";
+                var flag = $.hands.Add(types);
+                if (flag) {
+                    top.$("#LAY_app_tabsheader").children(".layui-this").children(".layui-tab-close").trigger("click");
+                };
+            },
+            Add: function (SHType) {
                 $('#list1').jqGrid("saveCell", lastrow, lastcell);
                 //选择日期判断
                 var BillDate = $('#BillDate').val();
@@ -282,7 +292,7 @@
                     $.loading(true, "正在提交数据");
                     $.ajax({
                         url: "/OrderBill/SaveOrderBill",
-                        data: { OrderBiils: Bill, OrderBiils_MX: AddData },
+                        data: { SHTypes: SHType, OrderBiils: Bill, OrderBiils_MX: AddData },
                         dataType: "json",
                         type: "post",
                         async: false,
@@ -322,6 +332,7 @@
             init:function() {
                 $('#SaveAdd').on('click', $.hands.SaveAdd);
                 $('#Add').on('click', $.hands.AddClose);
+                $('#AddSH').on('click', $.hands.AddSH);
 
             }
         }

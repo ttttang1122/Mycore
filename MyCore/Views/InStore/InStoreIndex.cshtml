@@ -1,6 +1,6 @@
 ﻿
 @{
-    ViewData["Title"] = "OrderBillIndex";
+    ViewData["Title"] = "InStoreIndex";
     Layout = "~/Views/Share/_LayoutBody.cshtml";
 }
 
@@ -12,9 +12,9 @@
                 <div class="layui-form-item" style="margin-bottom:5px">
                     <div class="layui-input-inline" style="width:100px">
                         <select id="StrSearchType" name="query" lay-verify="required">
-                            <option value="0">订单号</option>
-                            <option value="1">采购员</option>
-                            <option value="2">供应商</option>
+                            <option value="0">单据编号</option>
+                            <option value="1">验收员</option>
+                            <option value="2">制单人</option>
                         </select>
                     </div>
                     <div class="layui-input-inline">
@@ -52,7 +52,7 @@
         bodyheight = document.body.scrollHeight;
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
-            url: '@Url.Action("OrderBillList")',
+            url: '/InStore/InStoreList',
             datatype: "json",
             jsonReader: {
                 repeatitems: false
@@ -60,8 +60,8 @@
             colModel: [
                 { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true},
                 { label: '单据日期', name: 'BillDate', index: 'BillDate', width: 100, align: 'center'},
-                { label: '订单号', name: 'BillID', index: 'BillID', width: 180, align: 'center' },
-                { label: '采购员', name: 'CGName', index: 'CGName', width:120, align: 'center'},
+                { label: '入库单号', name: 'BillID', index: 'BillID', width: 180, align: 'center' },
+                { label: '验收员', name: 'CGName', index: 'CGName', width:120, align: 'center'},
                 { label: '供应商', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
                 { label: '备注', name: 'BZ', index: 'BZ', width: 100, align: 'center' },
                 {
@@ -88,7 +88,7 @@
                 },
                 { label: '制单人', name: 'CreateName', index: 'CreateName', width: 100, align: 'center' },
                 { label: '审核人', name: 'SHName', index: 'SHName', width: 100, align: 'center' },
-                
+
             ],
             width: "99%",
             autowidth: true,
@@ -117,7 +117,7 @@
 
                 // (6)创建jqGrid对象
                 $("#" + subgrid_table_id).jqGrid({
-                    url: "/OrderBill/OrderBill_MXList?&id=" + row_id,  // (7)子表格数据对应的url，注意传入的contact.id参数
+                    url: "/InStore/InStore_MXList?&id=" + row_id,  // (7)子表格数据对应的url，注意传入的contact.id参数
                     datatype: "json",
                     styleUI: 'Bootstrap',
                     colModel: [
@@ -175,11 +175,12 @@
     $(function (){
         $.hands = {
             Add: function () {
+                var url = "/InStore/AddEditOrderIndex" + "?types=add" ;
                 if (top.layui.index) {
-                    top.layui.index.openTabsPage('/OrderBill/AddOrderIndex', "新增订单")
+                    top.layui.index.openTabsPage(url, "新增入库单")
                 } else {
-                    window.open('/OrderBill/AddOrderIndex')
-                }      
+                    window.open(url)
+                }
                 //$.FromOpen('StoreFromAdd', '新增仓库', '/StoreInfo/AddIndex', '600px', '350px', '1000');
             },
             Edit: function () {
@@ -190,12 +191,12 @@
                     layer.msg("请选择一行", { icon: 2 });
                     return;
                 }
-                var url = "/OrderBill/EditOrderIndex" + "?ids=" + ids;
+                var url = "/InStore/AddEditOrderIndex" + "?ids=" + ids+"&types=edit";
                 if (top.layui.index) {
-                    top.layui.index.openTabsPage(url, "修改订单")
+                    top.layui.index.openTabsPage(url, "修改入库单")
                 } else {
-                    window.open('/OrderBill/EditOrderIndex')
-                }     
+                    window.open(url)
+                }
 
             },
             Del: function () {
@@ -207,13 +208,13 @@
                     return;
                 }
                 layer.confirm('确认要删除选择的数据吗？', {
-                    title: "删除采购订单",
+                    title: "删除采购入库单",
                     btn: ['确定', '关闭'] //按钮
                 }, function (index, layero) {
                     $.loading(true, "正在删除数据");
                     window.setTimeout(function () {
                         $.ajax({
-                            url: "/OrderBill/DeleteBill/",
+                            url: "/InStore/DeleteBill/",
                             data: { ids: ids },
                             type: "post",
                             dataType: "json",
@@ -296,7 +297,7 @@
                     return;
                 }
                 layer.confirm('确认要审核选择的数据吗？', {
-                    title: "审核采购订单",
+                    title: "审核采购入库单",
                     btn: ['确定', '关闭'] //按钮
                 }, function (index, layero) {
                     $.loading(true, "正在审核数据");
@@ -343,7 +344,7 @@
                     return;
                 }
                 layer.confirm('确认要反审核选择的数据吗？', {
-                    title: "反审核采购订单",
+                    title: "反审核采购入库单",
                     btn: ['确定', '关闭'] //按钮
                 }, function (index, layero) {
                     $.loading(true, "正在反审核数据");
@@ -395,6 +396,8 @@
     });
 
 </script>
+
+
 
 
 
