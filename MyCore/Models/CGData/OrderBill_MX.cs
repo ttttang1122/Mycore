@@ -70,7 +70,7 @@ namespace MyCore.Models.CGData
         /// </summary>
         public decimal EndNum { get; set; }
         /// <summary>
-        /// 完成状态
+        /// 完成状态0未完成 1完成
         /// </summary>
         public int? Status { get; set; }
         /// <summary>

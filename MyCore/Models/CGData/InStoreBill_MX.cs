@@ -19,6 +19,19 @@ namespace MyCore.Models.CGData
         /// </summary>
         public int Bill_id { get; set; }
         /// <summary>
+        /// 仓库ID
+        /// </summary>
+        public int? StroeInfo_id { get; set; }
+        /// <summary>
+        /// 仓库ID
+        /// </summary>
+        [StringLength(45)]
+        public string StoreName { get; set; }
+        /// <summary>
+        /// 订单对应行号
+        /// </summary>
+        public int? OrderRow { get; set; }
+        /// <summary>
         /// 商品id
         /// </summary>
         [StringLength(145)]

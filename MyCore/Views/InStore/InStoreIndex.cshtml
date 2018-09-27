@@ -61,20 +61,11 @@
                 { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true},
                 { label: '单据日期', name: 'BillDate', index: 'BillDate', width: 100, align: 'center'},
                 { label: '入库单号', name: 'BillID', index: 'BillID', width: 180, align: 'center' },
-                { label: '验收员', name: 'CGName', index: 'CGName', width:120, align: 'center'},
+                { label: '验收员', name: 'CGName', index: 'CGName', width:80, align: 'center'},
                 { label: '供应商', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
+                { label: '仓库', name: 'StoreName', index: 'StoreName', width: 120, align: 'center' },
+                { label: '金额', name: 'Sum', index: 'Sum', width: 120, align: 'center' },
                 { label: '备注', name: 'BZ', index: 'BZ', width: 100, align: 'center' },
-                {
-                    label: '完成状态', name: 'Status', index: 'Status', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
-                        if (cellvalue == "0") {
-                            return '<span class="layui-badge layui-bg-red">未完成</span>';
-                        } else if (cellvalue == "1") {
-                            return '<span class="layui-badge layui-bg-green">已完成</span>';
-                        } else {
-                            return '<span class="layui-badge layui-bg-orange">未知</span>';
-                        }
-                    }
-                },
                 {
                     label: '审核状态', name: 'SHStatus', index: 'SHStatus', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
                         if (cellvalue == "0") {
@@ -127,11 +118,13 @@
                         { label: '规格', name: 'GGType', index: 'GGType', width: 100, align: 'center' },
                         { label: '型号', name: 'ModelType', index: 'ModelType', width: 75, align: 'center' },
                         { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 75, align: 'center' },
+                        { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 75, align: 'center' },
+                        { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 75, align: 'center' },
+                        { label: '生产日期', name: 'scDate', index: 'scDate', width: 75, align: 'center' },
+                        { label: '有效期至', name: 'yxqDate', index: 'yxqDate', width: 75, align: 'center' },
                         { label: '单价', name: 'Price', index: 'Price', width: 75, align: 'center' },
                         { label: '数量', name: 'Num', index: 'Num', width: 80, align: 'center' },
                         { label: '金额', name: 'Sum', index: 'Sum', width: 80, align: 'center' },
-                        { label: '完成数量', name: 'EndNum', index: 'EndNum', width: 80, align: 'center' },
-                        { label: '完成状态', name: 'Status', index: 'Status', width: 80, align: 'center' },
                         { label: '备注', name: 'BZ', index: 'BZ', width: 80, align: 'center' },
                     ],
                     jsonReader: {   // (8)针对子表格的jsonReader设置
@@ -263,7 +256,7 @@
                 window.setTimeout(function () {
                     var funFrom = document.createElement("form");
                     document.body.appendChild(funFrom);
-                    funFrom.action = '/OrderBill/GetFile/';
+                    funFrom.action = '/InStore/GetFile/';
                     funFrom.method = 'post';
 
                     var total = $("#list1").jqGrid('getGridParam', 'records');
@@ -303,7 +296,7 @@
                     $.loading(true, "正在审核数据");
                     window.setTimeout(function () {
                         $.ajax({
-                            url: "/OrderBill/SHBill/",
+                            url: "/InStore/SHBill/",
                             data: { ids: ids },
                             type: "post",
                             dataType: "json",
@@ -350,7 +343,7 @@
                     $.loading(true, "正在反审核数据");
                     window.setTimeout(function () {
                         $.ajax({
-                            url: "/OrderBill/NOSHBill/",
+                            url: "/InStore/NOSHBill/",
                             data: { ids: ids },
                             type: "post",
                             dataType: "json",

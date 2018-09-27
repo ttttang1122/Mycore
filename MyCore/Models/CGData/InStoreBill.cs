@@ -51,6 +51,15 @@ namespace MyCore.Models.CGData
         [StringLength(145)]
         public string SupName { get; set; }
         /// <summary>
+        /// 仓库ID
+        /// </summary>
+        public int StroeInfo_id { get; set; }
+        /// <summary>
+        /// 仓库ID
+        /// </summary>
+        [StringLength(45)]
+        public string StoreName { get; set; }
+        /// <summary>
         /// 总金额
         /// </summary>
         public decimal? Sum { get; set; }

@@ -21,6 +21,7 @@ namespace MyCore.Controllers
         public IActionResult Default()
         {
             return View();
+          
         }
     }
 }

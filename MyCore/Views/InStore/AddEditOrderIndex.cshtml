@@ -31,6 +31,9 @@
         padding-bottom: 5px;
         line-height: 20px;
     }
+    .modal-content {
+        position: absolute;
+    }
 </style>
 <div class="layui-fluid">
     <div class="layui-row layui-col-space10">
@@ -40,7 +43,7 @@
                     <form class="layui-form">
                         <div class="layui-form-item" style="margin-bottom:5px">
                             <label class="layui-form-label">单据日期</label>
-                            <div class="layui-input-inline" style="width:100px">
+                            <div class="layui-input-inline" style="width:140px">
                                 <input type="text" name="BillDate" class="layui-input" id="BillDate">
                             </div>
                             <label class="layui-form-label">验收员</label>
@@ -49,18 +52,26 @@
                                     <option value="">==请选择==</option>
                                 </select>
                             </div>
+                            <label class="layui-form-label">仓库</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <select id="StoreName" name="StoreName" lay-search lay-verify="required">
+                                    <option value="">==请选择==</option>
+                                </select>
+                            </div>
+                           
+
+                        </div>
+                        <div class="layui-form-item">
                             <div class="layui-input-inline" style="display:none">
-                                <input type="text" id="Sup_id" name="Sup_id" class="layui-input" >
+                                <input type="text" id="Sup_id" name="Sup_id" class="layui-input">
                             </div>
                             <label class="layui-form-label">供应商</label>
                             <div class="layui-input-inline" style="width:140px">
                                 <input type="text" id="SupName" name="SupName" class="layui-input" style="width:140px;" readonly="true">
                             </div>
-                        </div>
-                        <div class="layui-form-item">
                             <label class="layui-form-label">总金额</label>
-                            <div class="layui-input-inline" style="width:100px">
-                                <input type="text" name="Sum" class="layui-input" id="Sum"  readonly="true">
+                            <div class="layui-input-inline" style="width:140px">
+                                <input type="text" name="Sum" class="layui-input" id="Sum" readonly="true">
                             </div>
                             <div class="layui-input-inline" style="display:none">
                                 <input type="text" id="OrderBill_id" name="OrderBill_id" class="layui-input" style="width:140px;">
@@ -68,11 +79,11 @@
 
                             <label class="layui-form-label">关联订单号</label>
                             <div class="layui-input-inline" style="width:140px">
-                                <input type="text" id="OrderBillID" name="OrderBillID" required lay-verify="required"  class="layui-input" style="width:140px;" readonly="true">
+                                <input type="text" id="OrderBillID" name="OrderBillID" required lay-verify="required" class="layui-input" style="width:140px;" readonly="true">
                             </div>
                             <label class="layui-form-label">备注</label>
                             <div class="layui-input-inline" style="width:140px">
-                                <input type="text" id="BZ" name="BZ"  class="layui-input" style="width:140px;">
+                                <input type="text" id="BZ" name="BZ" class="layui-input" style="width:200px;">
                             </div>
                         </div>
                     </form>
@@ -96,6 +107,7 @@
     var keyValueids = $.request("ids");//修改的单据号
     var lastrow;  //最后修改行号先定义一个全局变量
     var lastcell; //最后修改列号先定义一个全局变量
+    var layueform;
     //初始化界面  
     $(function () {
         $("#list1").jqGrid({
@@ -112,22 +124,46 @@
                         return detail;
                     }
                 },
+                { label: '订单行id', name: 'OrderRow', index: 'OrderRow', width: 100, align: 'center', hidden: true},
                 { label: '商品id', name: 'Good_id', index: 'Good_id', width: 100, align: 'center', hidden: true },
                 { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 100, align: 'center', hidden: true },
-                { label: '商品名称', name: 'GoodName', index: 'GoodName', width: 140, align: 'center' },
+                { label: '*商品名称', name: 'GoodName', index: 'GoodName', width: 140, align: 'center' },
                 { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
-                { label: '规格', name: 'GGType', index: 'GGType', width: 100, align: 'center' },
-                { label: '型号', name: 'ModelType', index: 'ModelType', width: 100, align: 'center' },
-                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 100, align: 'center' },
+                { label: '规格', name: 'GGType', index: 'GGType', width: 100, align: 'center' },          
                 { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center', editable: true },
                 { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center', editable: true },
-                { label: '生产日期', name: 'scDate', index: 'scDate', width: 100, align: 'center', editable: true},
-                { label: '有效期至', name: 'yxqDate', index: 'yxqDate', width: 100, align: 'center', editable: true },
-                { label: '单价', name: 'Price', index: 'Price', width: 100, align: 'center', editable: true },
-                { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center', editable: true },
-                { label: '金额', name: 'Sum', index: 'Sum', width: 100, align: 'center' },
-                { label: '备注', name: 'BZ', index: 'BZ', width: 140, align: 'center', editable: true },
+                {
+                    label: '生产日期', name: 'scDate', index: 'scDate', width: 100, align: 'center', editable: true,
+                    editrules: {
+                        date: true
+                    },
+                    datefmt: "yyyy-MM-dd"
+                },
+                {
+                    label: '有效期至', name: 'yxqDate', index: 'yxqDate', width: 100, align: 'center', editable: true,
+                    editrules: {
+                        date: true
+                    },
+                    datefmt: "yyyy-MM-dd"
+                },         
+                {
+                    label: '*数量', name: 'Num', index: 'Num', width: 100, align: 'center', editable: true,
+                    editrules: {
+                        edithidden: true, number: true, minValue: 0
+                    }
 
+                },
+                {
+                    label: '*单价', name: 'Price', index: 'Price', width: 100, align: 'center', editable: true,
+                    editrules: {
+                        edithidden: true, number: true, minValue: 0
+                    }
+                },
+                { label: '金额', name: 'Sum', index: 'Sum', width: 100, align: 'center' },
+                { label: '型号', name: 'ModelType', index: 'ModelType', width: 100, align: 'center' },   
+                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 100, align: 'center' },
+                { label: '备注', name: 'BZ', index: 'BZ', width: 140, align: 'center', editable: true },
+                
             ],
             width: "100%",
             autowidth: true,
@@ -150,6 +186,7 @@
         for (var i = 1; i <= 15; i++) {
             var item = {
                 "ids": i,
+                "OrderRow":'',
                 "Good_id": '',
                 "GoodID": '',
                 "GoodName": '',
@@ -178,6 +215,12 @@
                 id: "id",
                 text: "UserName"
             });
+            //采购员
+            $("#StoreName").bindSelect({
+                url: "/InStore/GetStoreInfo",
+                id: "id",
+                text: "StoreName"
+            });
             //新增初始化
             if (keyValuetypes == "add") {
                 var strdate = new Date().Format("yyyy-MM-dd");
@@ -202,13 +245,14 @@
                         success: function (datas) {
                             var orderbill = datas.bills;
                             var orderbill_mx = datas.bills.orderBill_MX;
-                            $("#CGName").val(orderbill.cgNameID);
+                            $("#YSName").val(orderbill.cgNameID);
                             $("#SupName").val(orderbill.sup_id);
                             var BillDates = orderbill.billDate.toString().substring(0, 10);
                             $("#BillDate").val(BillDates);
                             $("#BZ").val(orderbill.bz);
                             $.each(orderbill_mx, function (i) {
                                 var item = {
+                                    "OrderRow": orderbill_mx[i].OrderRow,
                                     "Good_id": orderbill_mx[i].good_id,
                                     "GoodID": orderbill_mx[i].goodID,
                                     "GoodName": orderbill_mx[i].goodName,
@@ -240,9 +284,8 @@
 
                 });
             }
-         
-           
-
+                   
+            layueform = form;
             form.render();
 
         });
@@ -250,6 +293,7 @@
     });
     //加载明细表方法之一
     function EditAddRow(ids, item) {
+        $("#list1").jqGrid('setCell', ids, 'OrderRow', item.OrderRow);
         $("#list1").jqGrid('setCell', ids, 'Good_id', item.Good_id);
         $("#list1").jqGrid('setCell', ids, 'GoodID', item.GoodID);
         $("#list1").jqGrid('setCell', ids, 'GoodName', item.GoodName);
@@ -260,11 +304,11 @@
         $("#list1").jqGrid('setCell', ids, 'Price', item.Price);
         $("#list1").jqGrid('setCell', ids, 'Num', item.Num);
         $("#list1").jqGrid('setCell', ids, 'Sum', item.Sum);
-        $("#list1").jqGrid('setCell', ids, 'BZ', item.BZ);
 
     };
     //填充一行商品信息
     function AddRow(item) {
+        $("#list1").jqGrid('setCell', item.ids, 'OrderRow', item.OrderRow);
         $("#list1").jqGrid('setCell', item.ids, 'Good_id', item.Good_id);
         $("#list1").jqGrid('setCell', item.ids, 'GoodID', item.GoodID);
         $("#list1").jqGrid('setCell', item.ids, 'GoodName', item.GoodName);
@@ -278,6 +322,7 @@
     };
     //删除一行商品信息
     function DelRow(ids) {
+        $("#list1").jqGrid('setCell', ids, 'OrderRow', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'Good_id', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'GoodID', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'GoodName', "&nbsp");
@@ -286,6 +331,10 @@
         $("#list1").jqGrid('setCell', ids, 'ModelType', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'SCCJ', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'Price', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'SCPH', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'MJPH', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'scDate', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'yxqDate', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'Num', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'Sum', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'BZ', "&nbsp");
@@ -297,8 +346,48 @@
             data: $('#form1').serialize(),
             type: "post",
             dataType: "json",
-            success: function (data) {
-               
+            success: function (datas) {
+                var sumMoney = 0;
+                var orderbill = datas.bills;
+                var orderbill_mx = datas.bills.orderBill_MX;
+                $("#Sup_id").val(orderbill.sup_id);
+                $("#SupName").val(orderbill.supName);
+                $("#OrderBill_id").val(orderbill.id);
+                $("#OrderBillID").val(orderbill.billID);
+                $.each(orderbill_mx, function (i) {
+                    //总数量
+                    var SumNum = parseInt(orderbill_mx[i].num);
+                    //已完成数量
+                    var EndNum = parseInt(orderbill_mx[i].endNum);
+                    //单价
+                    var Price = parseInt(orderbill_mx[i].price);
+                    //剩余数量
+                    var Nums = SumNum - EndNum;
+                    if (Nums == 0) {
+                        return true;
+                    }
+                    //金额
+                    var sum = Nums * Price;
+                    //总金额
+                    sumMoney = sumMoney + sum;
+                    var item = {
+                        "OrderRow": orderbill_mx[i].id,
+                        "Good_id": orderbill_mx[i].good_id,
+                        "GoodID": orderbill_mx[i].goodID,
+                        "GoodName": orderbill_mx[i].goodName,
+                        "DW": orderbill_mx[i].dw,
+                        "GGType": orderbill_mx[i].ggType,
+                        "ModelType": orderbill_mx[i].modelType,
+                        "SCCJ": orderbill_mx[i].sccj,
+                        "Price": orderbill_mx[i].price,
+                        "Num": Nums,
+                        "Sum": sum,
+                    };
+                    EditAddRow(i + 1, item);
+
+                });
+
+                $("#Sum").val(sumMoney);
             },
             error: function () {
                 
@@ -314,22 +403,40 @@
         $.hands = {
             //选择采购订单
             ChooseOrder: function () {
+                $.hands.Empty();
                 var url = "/InStore/ChooseOrderIndex";
-                $.FromOpen('InStoreFromChooseOrder', '选择采购订单', url, '670px', '570px', '1000');
+                $.FromOpen('InStoreFromChooseOrder', '选择采购订单', url, '680px', '570px', '1000');
             },
             //清空
             Empty: function () {
-
-
+                for (var i = 1; i <= 15; i++) {
+                    DelRow(i);
+                } 
+                $("#Sup_id").val('');
+                $("#SupName").val('');
+                $("#OrderBill_id").val('');
+                $("#OrderBillID").val('');
+                $("#Sum").val('');
+                $("#YSName").val('');
+                $("#StoreName").val('');
+                layueform.render('select');
             },
             //保存并新增
             SaveAdd: function () {
-
+                var shs = "no";
+                var flag = $.hands.Add(keyValuetypes, shs);
+                if (flag) {
+                    var rowdata = [];
+                    for (var i = 1; i <= 15; i++) {
+                        DelRow(i);
+                    }
+                };
 
             },
             //保存并关闭
             AddClose: function () {
-                var flag = $.hands.Add();
+                var shs = "no";
+                var flag = $.hands.Add(keyValuetypes, shs);
                 if (flag) {
                     top.$("#LAY_app_tabsheader").children(".layui-this").children(".layui-tab-close").trigger("click");
                 };
@@ -337,11 +444,15 @@
             },
             //保存并审核
             AddSH: function () {
-
+                var shs = "yes";
+                var flag = $.hands.Add(keyValuetypes,shs);
+                if (flag) {
+                    top.$("#LAY_app_tabsheader").children(".layui-this").children(".layui-tab-close").trigger("click");
+                };
 
             },
             //保存
-            Add: function () {
+            Add: function (BillType,SHType) {
                 $('#list1').jqGrid("saveCell", lastrow, lastcell);
                 //选择日期判断
                 var BillDate = $('#BillDate').val();
@@ -350,43 +461,90 @@
                     return false;
                 }
                 //选择采购员判断
-                var CGNameID = $('#CGName').val();
-                if (CGNameID == "" || CGNameID == undefined || CGNameID == null) {
-                    layer.msg("请选择采购员", { icon: 2 });
+                var YSNameID = $('#YSName').val();
+                if (YSNameID == "" || YSNameID == undefined || YSNameID == null) {
+                    layer.msg("请选择验收员", { icon: 2 });
                     return false;
                 }
-                var CGName = $("#CGName option:selected").text();
+                var YSName = $("#YSName option:selected").text();
+                //选择采购员判断
+                var StroeInfo_id = $('#StoreName').val();
+                if (StroeInfo_id == "" || StroeInfo_id == undefined || StroeInfo_id == null) {
+                    layer.msg("请选择仓库", { icon: 2 });
+                    return false;
+                }
+                var StoreName = $("#StoreName option:selected").text();
                 //选择供应商判断
-                var Sup_id = $('#SupName').val();
+                var Sup_id = $('#Sup_id').val();
                 if (Sup_id == "" || Sup_id == undefined || Sup_id == null) {
                     layer.msg("请选择供应商", { icon: 2 });
                     return false;
                 }
-                var SupName = $("#SupName option:selected").text();
-
+                var SupName = $("#SupName").val();
+                var OrderBill_id = $('#OrderBill_id').val();
+                if (OrderBill_id == "" || OrderBill_id == undefined || OrderBill_id == null) {
+                    layer.msg("请选择订单号", { icon: 2 });
+                    return false;
+                }
+                var OrderBillID = $('#OrderBillID').val();
                 var BZ = $('#BZ').val();
+                //明细数据
                 var AddData = [];
                 var datas = $("#list1").jqGrid("getRowData");
+                //判断明细是否是否正确
+                var dataFlag = true;
+               // 求和
+                var sums = 0;
                 $.each(datas, function (i) {
                     var row = datas[i];
                     if (row.GoodName != "" && row.GoodName != undefined && row.GoodName != null) {
+                        var rowsum = 0;
+                        //判断单价数量是否为空或者数量为0
+                        var datanum = Number(row.Num);
+                        var dataPrice = Number(row.Price);
+                        var dataSum = Number(row.Sum);
+                        if (isNaN(datanum)|| isNaN(dataPrice)) {                               
+                            dataFlag = false;
+                            return false;
+                        }
+                        if (datanum == 0) {
+                            dataFlag = false;
+                            return false;
+                        }    
+                        rowsum = datanum * dataPrice;
+                        if (rowsum != dataSum) {
+                            dataFlag = false;
+                            return false;
+                        }
+                        sums = sums + rowsum;
                         AddData.push(row);
                     }
+
                 });
+                if (dataFlag == false) {
+                    layer.msg("请输入正确单价或者数量", { icon: 2 });
+                    return false;
+
+                }
+                $("#Sum").val(sums);
                 if (AddData.length > 0) {
                     var Bill = {
                         "BillDate": BillDate,
-                        "CGNameID": CGNameID,
-                        "CGName": CGName,
+                        "StroeInfo_id": StroeInfo_id,
+                        "StoreName": StoreName,
+                        "YSNameID": YSNameID,
+                        "YSName": YSName,
                         "Sup_id": Sup_id,
                         "SupName": SupName,
+                        "OrderBill_id": OrderBill_id,
+                        "OrderBillID": OrderBillID,
                         "BZ": BZ
                     };
                     var flag = false;
                     $.loading(true, "正在提交数据");
                     $.ajax({
-                        url: "/OrderBill/EditOrderBill",
-                        data: { id: keyValue, OrderBiils: Bill, OrderBiils_MX: AddData },
+                        url: "/InStore/SaveBill",
+                        data: { SHType: SHType, InStoreBills: Bill, InStoreBills_MX: AddData },
                         dataType: "json",
                         type: "post",
                         async: false,
@@ -435,6 +593,26 @@
             $.hands.init();
         });
     });
+
+    //计算和
+    function SumMoney() {
+        var sums = 0;
+        var datas = $("#list1").jqGrid("getRowData");
+        $.each(datas, function (i) {
+            var row = datas[i];
+            if (row.GoodName != "" && row.GoodName != undefined && row.GoodName != null) {
+                var rowsum = Number(row.Sum);
+               
+                if (isNaN(rowsum) ) {
+                    rowsum = 0;;
+                }              
+                sums = sums + rowsum;
+            }
+
+        });
+        $("#Sum").val(sums);
+
+    }
     //计算单价 数量 金额
     $(document).on('keyup', '#list1>tbody>tr>td>input[type="text"]', function () {
         var _inputName = $(this).attr('name');
@@ -449,7 +627,7 @@
             var _num = Number(rowData.Num);
             var _sum = _price * _num;
             $("#list1").jqGrid('setCell', id, 'Sum', _sum);
-
+            SumMoney();
 
         } else if (_inputName == "Num") {
             var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
@@ -461,7 +639,7 @@
             }
             var _sum = _price * _num;
             $("#list1").jqGrid('setCell', id, 'Sum', _sum);
-
+            SumMoney();
         }
     });
 

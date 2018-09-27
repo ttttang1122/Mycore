@@ -10,9 +10,10 @@ using System;
 namespace MyCore.Migrations
 {
     [DbContext(typeof(MyCoreContext))]
-    partial class MyCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20180927082506_editinstores1")]
+    partial class editinstores1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,8 +254,6 @@ namespace MyCore.Migrations
                         .HasMaxLength(45);
 
                     b.Property<decimal>("Num");
-
-                    b.Property<int?>("OrderRow");
 
                     b.Property<decimal>("Price");
 

@@ -134,7 +134,7 @@ namespace MyCore.Controllers.CGGL
             {
                 var jsons = new
                 {
-                    errorMsg = "收款失败,无数据!"
+                    errorMsg = "保存失败,无数据!"
                 };
                 return Json(jsons);
             }
@@ -156,6 +156,7 @@ namespace MyCore.Controllers.CGGL
 
             foreach (var item in OrderBiils_MX)
                 {
+                   item.Status = 0;
                     if (item.Num == 0)
                     {
                         var json = new
@@ -274,6 +275,14 @@ namespace MyCore.Controllers.CGGL
 
             var orderBills = await conn.OrderBill.FirstOrDefaultAsync(b => b.id == ids);
             conn.Entry(orderBills).Collection(p => p.OrderBill_MX).Query().Load();
+            if (orderBills == null)
+            {
+                var jsons = new
+                {
+                    errorMsg = "删除失败,单据不存在!"
+                };
+                return Json(jsons);
+            }
             if (orderBills.SHStatus == 1)
             {
                 var jsons = new
@@ -385,6 +394,7 @@ namespace MyCore.Controllers.CGGL
 
             IQueryable<OrderBill> bills = conn.OrderBill;
 
+           
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
                 if (!string.IsNullOrWhiteSpace(StrSearch))
@@ -411,7 +421,6 @@ namespace MyCore.Controllers.CGGL
             }
 
             var lists = await bills.ToListAsync();
-
 
             byte[] buffer = ExcelHelp.Export<OrderBill>(lists, "采购订单", "采购订单", SysTool.GetPropertyNameArray<OrderBill>()).GetBuffer();
 
