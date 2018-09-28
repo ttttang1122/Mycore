@@ -59,7 +59,6 @@ namespace MyCore.Controllers.CGGL
             var lists = await bills.ToListAsync();
             return lists.GetJson<OrderBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<OrderBill>());
         }
-
         [HttpPost]
         public async Task<IActionResult> OrderBill_MXList(string sidx, string sord, int page, int rows, int id)
         {
@@ -93,11 +92,10 @@ namespace MyCore.Controllers.CGGL
             var data = sups.Select(p => new { p.id, p.SupName });
             return Content(data.ToJson());
         }
-
         [HttpPost]
         public async Task<IActionResult> GoodsList(string sidx, string sord, int page, int rows, string StrSearchType, string StrSearch)
         {
-            IQueryable<Goodinfo> goods = conn.Goodinfo;
+            IQueryable<Goodinfo> goods = conn.Goodinfo.Where(b=>b.Status==0);
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
                 if (!string.IsNullOrWhiteSpace(StrSearch))
@@ -125,8 +123,6 @@ namespace MyCore.Controllers.CGGL
 
             return lisbills.GetJson<Goodinfo>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<Goodinfo>());
         }
-
-
         [HttpPost]
         public async Task<IActionResult> SaveOrderBill(string SHTypes, OrderBill OrderBiils, List<OrderBill_MX> OrderBiils_MX)
         {
@@ -189,7 +185,6 @@ namespace MyCore.Controllers.CGGL
 
 
         }
-
         public async Task<IActionResult> GetBillList(int ids)
         {
             var orderBills = await conn.OrderBill.FirstOrDefaultAsync(b=>b.id==ids);
@@ -200,7 +195,6 @@ namespace MyCore.Controllers.CGGL
             };
             return Json(data);
         }
-
         [HttpPost]
         public async Task<IActionResult> EditOrderBill(int id, OrderBill OrderBiils, List<OrderBill_MX> OrderBiils_MX)
         {
@@ -268,7 +262,6 @@ namespace MyCore.Controllers.CGGL
 
 
         }
-
         [HttpPost]
         public async Task<IActionResult> DeleteBill(int ids)
         {
@@ -349,7 +342,6 @@ namespace MyCore.Controllers.CGGL
             }
 
         }
-
         [HttpPost]
         public async Task<IActionResult> NOSHBill(int ids)
         {
@@ -359,7 +351,16 @@ namespace MyCore.Controllers.CGGL
             {
                 var jsons = new
                 {
-                    errorMsg = "审核失败,单据未审核不可反审核!"
+                    errorMsg = "反审核失败,单据未审核不可反审核!"
+                };
+                return Json(jsons);
+            }
+            var instores = await conn.InStoreBill.Where(b => b.OrderBill_id == ids).ToListAsync();
+            if (instores.Count > 0)
+            {
+                var jsons = new
+                {
+                    errorMsg = "反审核失败,单据已生成入库单不可反审核!"
                 };
                 return Json(jsons);
             }
@@ -387,7 +388,6 @@ namespace MyCore.Controllers.CGGL
             }
 
         }
-
         [HttpPost]
         public async Task<IActionResult> GetFile(string StrSearchType, string StrSearch)
         {

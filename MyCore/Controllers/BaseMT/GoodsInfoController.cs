@@ -28,7 +28,7 @@ namespace MyCore.Controllers
         {
 
 
-            IQueryable<Goodinfo> goods = conn.Goodinfo.Where(b=>b.Status==1);
+            IQueryable<Goodinfo> goods = conn.Goodinfo.Where(b=>b.Status==0);
 
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
@@ -86,7 +86,7 @@ namespace MyCore.Controllers
                 m.ForType = good.ForType;
                 m.ShopPrice = good.ShopPrice;
                 m.BZ = good.BZ;
-                m.Status = 1;
+                m.Status = 0;
                 m.CreateDate = DateTime.Now;
                 m.CreateName = UserID;
                 conn.Goodinfo.Add(m);
@@ -201,7 +201,7 @@ namespace MyCore.Controllers
             var m = await conn.Goodinfo.FirstOrDefaultAsync(u => u.id == ids);
             if (m != null)
             {
-                m.Status = 2;
+                m.Status = 1;
             }
             //2.更新对象数据                   
             try

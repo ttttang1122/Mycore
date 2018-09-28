@@ -90,7 +90,7 @@ namespace MyCore.Models.CGData
         public string MJPH { get; set; }
         /// <summary>
         /// 生产日期
-        /// </summary>    
+        /// </summary>   
         public DateTime? scDate { get; set; }
         /// <summary>
         /// 有效期至

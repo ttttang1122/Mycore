@@ -81,7 +81,7 @@ namespace MyCore.Models.BaseData
         [StringLength(200)]
         public string BZ { get; set; }
         /// <summary>
-        /// 状态
+        /// 状态1 正常 2删除
         /// </summary>
         public int? Status { get; set; }
         /// <summary>
