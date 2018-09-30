@@ -10,9 +10,10 @@ using System;
 namespace MyCore.Migrations
 {
     [DbContext(typeof(MyCoreContext))]
-    partial class MyCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20180930063817_editbuyreturn")]
+    partial class editbuyreturn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,0 +1,166 @@
+﻿
+@{
+    ViewData["Title"] = "GoodsStoreIndex";
+    Layout = "~/Views/Share/_LayoutBody.cshtml";
+}
+
+
+<div class="list-wall">
+    <div class="list-top">
+        <div class="layui-btn-group">
+            <form class="layui-form">
+                <div class="layui-form-item" style="margin-bottom:5px">
+                    <div class="layui-input-inline" style="width:100px">
+                        <select id="StrSearchType" name="query" lay-verify="required">
+                            <option value="0">仓库名称</option>
+                            <option value="1">商品编号</option>
+                            <option value="2">商品名称</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <input type="text" id="StrSearch" name="title" required lay-verify="required" autocomplete="off" class="layui-input" style="width:200px;">
+                    </div>
+                    <div class="layui-input-inline" style="padding-left:10px">
+                        <button type="button" authorize="yes" class="layui-btn layui-btn-xs layui-btn-normal" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i> 查询</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="layui-btn-group" style="float:right">     
+            <button type="button" authorize="yes" class="layui-btn layui-btn-xs" data-type="Excel" id="Excel"><i class="layui-icon ">&#xe601;</i> 导出</button>
+        </div>
+
+       
+
+    </div>
+    <div class="gridPanel">
+        <table id="list1" class="table table-condensed"></table>
+        <div id="pager1"></div>
+    </div>
+</div>
+<script>$('.list-top').authorizeButton()</script>
+<script>
+    var CX_StrSearch = "";
+    var bodyheight = 0;
+      $(function () {
+        bodyheight = document.body.scrollHeight;
+        $("#list1").jqGrid({
+            styleUI: 'Bootstrap',
+            url: '/GoodsStore/GoodsStoreList',
+            datatype: "json",
+            jsonReader: {
+                repeatitems: false
+            },
+            colModel: [
+                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true},
+                { label: '仓库名称', name: 'StoreName', index: 'StoreName', width: 100, align: 'center'},
+                { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 80, align: 'center' },
+                { label: '商品名称', name: 'GoodName', index: 'GoodName', width: 180, align: 'center'},
+                { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
+                { label: '规格', name: 'GGType', index: 'GGType', width: 80, align: 'center' },
+                { label: '型号', name: 'ModelType', index: 'ModelType', width: 80, align: 'center' },
+                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 180, align: 'center' },
+                { label: '进货价', name: 'Price', index: 'Price', width: 100, align: 'center' },
+                { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center' },
+                { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
+                { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center' },
+                { label: '生产日期', name: 'scDate', index: 'scDate', width: 100, align: 'center' },
+                { label: '有效期至', name: 'yxqDate', index: 'yxqDate', width: 100, align: 'center' },
+            ],
+            width: "99%",
+            autowidth: true,
+            height: $(window).height()-110,
+            rowNum: 30,//一页显示多少条
+            rowList: [10,20,30,50,100],//可供用户选择一页显示多少条
+            pager: '#pager1',//表格页脚的占位符(一般是div)的id
+            sortname: 'id',//初始化的时候排序的字段
+            sortorder: "desc",//排序方式,可选desc,asc
+            mtype: "post",//向后台请求数据的ajax的类型。可选post,get
+            viewrecords: true,
+            shrinkToFit: false,
+            rownumbers: true,       
+          });
+          $(window).bind('resize', function () {
+              $("#list1").setGridWidth($(window).width() - 20);
+              $("#list1").setGridHeight($(window).height() - 110);
+          }).trigger('resize');
+
+    });
+    $(function () {
+        layui.use('form', function () {
+            var form = layui.form;
+            $('#StrSearchType').val(0);
+            form.render();
+        });
+    });
+
+    $(function (){
+        $.hands = {
+            
+            Search: function () {
+                $.loading(true, "正在查询数据");
+                CX_StrSearchType = $('#StrSearchType').val();
+                CX_StrSearch = $('#StrSearch').val();
+                window.setTimeout(function () {
+                    $("#list1").jqGrid('setGridParam', {
+                        datatype: 'json',
+                        postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch },
+                        //page: 1
+                    }).trigger("reloadGrid");
+
+                    $.loading(false);
+                }, 500);
+            },
+            Excel: function () {
+                $.loading(true, "正在提交数据");
+                window.setTimeout(function () {
+                    var funFrom = document.createElement("form");
+                    document.body.appendChild(funFrom);
+                    funFrom.action = '/GoodsStore/GetFile/';
+                    funFrom.method = 'post';
+
+                    var total = $("#list1").jqGrid('getGridParam', 'records');
+                    if (parseInt(total) > 0) {
+                        var newStrSearchType = document.createElement("input");
+                        newStrSearchType.setAttribute("name", "StrSearchType");
+                        newStrSearchType.setAttribute("type", "hidden");
+                        newStrSearchType.setAttribute("value", CX_StrSearchType);
+
+                        var newStrSearch = document.createElement("input");
+                        newStrSearch.setAttribute("name", "StrSearch");
+                        newStrSearch.setAttribute("type", "hidden");
+                        newStrSearch.setAttribute("value", CX_StrSearch);
+
+                        funFrom.appendChild(newStrSearchType);
+                        funFrom.appendChild(newStrSearch);
+                        funFrom.submit();
+                    } else {
+                        top.layer.msg("空数据导出失败", { icon: 2 });
+                    }
+
+                }, 500);
+                $.loading(false);
+            },        
+            init:function() {               
+                $('#Search').on('click', $.hands.Search);
+                $('#Excel').on('click', $.hands.Excel);            
+            }
+        }
+        $(function () {
+            $.hands.init();
+        });
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+

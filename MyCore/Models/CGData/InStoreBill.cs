@@ -24,6 +24,11 @@ namespace MyCore.Models.CGData
         /// </summary>
         public DateTime? BillDate { get; set; }
         /// <summary>
+        /// 单据类型IS入库。BR出库
+        /// </summary>
+        [StringLength(10)]
+        public string BillType { get; set; }
+        /// <summary>
         /// 制单人日期
         /// </summary>
         public DateTime? CreateDate { get; set; }

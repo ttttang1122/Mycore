@@ -15,6 +15,7 @@ namespace MyCore.Controllers.CGGL
 {
     public class OrderBillController : BaseController
     {
+      
         private MyCoreContext conn;
         public OrderBillController(MyCoreContext _conn)
         {

@@ -30,7 +30,7 @@ namespace MyCore.Controllers.CGMT
         {
 
 
-            IQueryable<InStoreBill> bills = conn.InStoreBill;
+            IQueryable<InStoreBill> bills = conn.InStoreBill.Where(b=>b.BillType=="IS");
 
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
@@ -146,6 +146,7 @@ namespace MyCore.Controllers.CGMT
             string UserID = HttpContext.Session.GetString("UserID");
             DateTime now = DateTime.Now;
             InStoreBills.BillID = string.Concat("IS.", now.ToString("yyyyMMddHHmmsss"));
+            InStoreBills.BillType = "IS";
             InStoreBills.CreateName = UserID;
             InStoreBills.CreateDate = DateTime.Now;
             InStoreBills.SHStatus = 0;
@@ -752,7 +753,7 @@ namespace MyCore.Controllers.CGMT
         public async Task<IActionResult> GetFile(string StrSearchType, string StrSearch)
         {
 
-            IQueryable<InStoreBill> bills = conn.InStoreBill;
+            IQueryable<InStoreBill> bills = conn.InStoreBill.Where(b => b.BillType == "IS");
 
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
