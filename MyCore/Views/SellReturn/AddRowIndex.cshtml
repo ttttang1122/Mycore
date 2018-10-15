@@ -41,45 +41,47 @@
     var keyValue = $.request("ids");
     var keyValueStroeid = $.request("StroeInfo_id");
        $(function () {
-        $("#list1").jqGrid({
-            styleUI: 'Bootstrap',
-            url: '/BuyReturn/GoodsStoreList/?Store_id=' + keyValueStroeid,
-            datatype: "json",
-            jsonReader: {
-                repeatitems: false
-            },
-            colModel: [
-                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true }, 
-                { label: '仓库主键', name: 'Store_id', index: 'Store_id', width: 80, align: 'center', hidden: true },
-                { label: '商品主键', name: 'Good_id', index: 'Good_id', width: 80, align: 'center', hidden: true },
-                { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 80, align: 'center' },
-                { label: '商品名称', name: 'GoodName', index: 'GoodName', width: 180, align: 'center' },
-                { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
-                { label: '规格', name: 'GGType', index: 'GGType', width: 80, align: 'center' },
-                { label: '型号', name: 'ModelType', index: 'ModelType', width: 80, align: 'center' },
-                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 180, align: 'center' },
-                { label: '进货价', name: 'Price', index: 'Price', width: 100, align: 'center' },
-                { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center' },
-                { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
-                { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center' },
-                { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
-                { label: '有效期至', name: 'yxqDate', index: 'yxqDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' },width: 100, align: 'center' },
-                { label: '仓库名称', name: 'StoreName', index: 'StoreName', width: 100, align: 'center' },
-                ],
-            width: 575,
-            height:295,
-            rowNum: 30,//一页显示多少条
-            rowList: [10,20,30,50,100],//可供用户选择一页显示多少条
-            pager: '#pager1',//表格页脚的占位符(一般是div)的id
-            sortname: 'Good_id',//初始化的时候排序的字段
-            sortorder: "asc",//排序方式,可选desc,asc
-            mtype: "post",//向后台请求数据的ajax的类型。可选post,get
-            viewrecords: true,
-            shrinkToFit: false,
-            rownumbers: true,
-            ondblClickRow: function (rowid, iRow, iCol, e) {
-                submitForm();
-            },
+           $("#list1").jqGrid({
+               styleUI: 'Bootstrap',
+               url: '/SellReturn/GoodsStoreList/?Store_id=' + keyValueStroeid,
+               datatype: "json",
+               jsonReader: {
+                   repeatitems: false
+               },
+               colModel: [
+                   { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true },
+                   { label: '仓库主键', name: 'Store_id', index: 'Store_id', width: 80, align: 'center', hidden: true },
+                   { label: '商品主键', name: 'Good_id', index: 'Good_id', width: 80, align: 'center', hidden: true },
+                   { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 80, align: 'center' },
+                   { label: '商品名称', name: 'GoodName', index: 'GoodName', width: 180, align: 'center' },
+                   { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
+                   { label: '规格', name: 'GGType', index: 'GGType', width: 80, align: 'center' },
+                   { label: '型号', name: 'ModelType', index: 'ModelType', width: 80, align: 'center' },
+                   { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 180, align: 'center' },
+                   { label: '进货价', name: 'InPrice', index: 'InPrice', width: 100, align: 'center' },
+                   { label: '销售价', name: 'SellPrice', index: 'SellPrice', width: 100, align: 'center' },
+                   { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center' },
+                   { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
+                   { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center' },
+                   { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
+                   { label: '有效期至', name: 'yxqDate', index: 'yxqDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
+                   { label: '仓库名称', name: 'StoreName', index: 'StoreName', width: 100, align: 'center' },
+               ],
+               width: 575,
+               height: 295,
+               rowNum: 30,//一页显示多少条
+               rowList: [10, 20, 30, 50, 100],//可供用户选择一页显示多少条
+               pager: '#pager1',//表格页脚的占位符(一般是div)的id
+               sortname: 'Good_id',//初始化的时候排序的字段
+               sortorder: "asc",//排序方式,可选desc,asc
+               mtype: "post",//向后台请求数据的ajax的类型。可选post,get
+               viewrecords: true,
+               shrinkToFit: false,
+               rownumbers: true,
+               ondblClickRow: function (rowid, iRow, iCol, e) {
+                   submitForm();
+               },
+
            });
 
            layui.use('form', function () {
@@ -133,7 +135,8 @@
             "GGType": rowData.GGType,
             "ModelType": rowData.ModelType,
             "SCCJ": rowData.SCCJ,
-            "Price": rowData.Price,
+            "InPrice": rowData.InPrice,
+            "SellPrice": rowData.SellPrice,
             "Num": rowData.Num,
             "SCPH": rowData.SCPH,
             "MJPH": rowData.MJPH,
@@ -147,4 +150,8 @@
 
     }
 </script>
+
+
+
+
 

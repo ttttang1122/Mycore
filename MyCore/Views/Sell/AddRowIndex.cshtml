@@ -5,6 +5,7 @@
 }
 
 
+
 <style>
     h2, .h2 {
         margin-top: 0px;
@@ -43,13 +44,13 @@
        $(function () {
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
-            url: '/BuyReturn/GoodsStoreList/?Store_id=' + keyValueStroeid,
+            url: '/Sell/GoodsStoreList/?Store_id=' + keyValueStroeid,
             datatype: "json",
             jsonReader: {
                 repeatitems: false
             },
             colModel: [
-                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true }, 
+                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true },
                 { label: '仓库主键', name: 'Store_id', index: 'Store_id', width: 80, align: 'center', hidden: true },
                 { label: '商品主键', name: 'Good_id', index: 'Good_id', width: 80, align: 'center', hidden: true },
                 { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 80, align: 'center' },
@@ -58,7 +59,8 @@
                 { label: '规格', name: 'GGType', index: 'GGType', width: 80, align: 'center' },
                 { label: '型号', name: 'ModelType', index: 'ModelType', width: 80, align: 'center' },
                 { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 180, align: 'center' },
-                { label: '进货价', name: 'Price', index: 'Price', width: 100, align: 'center' },
+                { label: '进货价', name: 'InPrice', index: 'InPrice', width: 100, align: 'center' },
+                { label: '销售价', name: 'SellPrice', index: 'SellPrice', width: 100, align: 'center' },
                 { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center' },
                 { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
                 { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center' },
@@ -133,7 +135,8 @@
             "GGType": rowData.GGType,
             "ModelType": rowData.ModelType,
             "SCCJ": rowData.SCCJ,
-            "Price": rowData.Price,
+            "InPrice": rowData.InPrice,
+            "SellPrice": rowData.SellPrice,
             "Num": rowData.Num,
             "SCPH": rowData.SCPH,
             "MJPH": rowData.MJPH,
@@ -147,4 +150,6 @@
 
     }
 </script>
+
+
 

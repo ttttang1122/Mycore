@@ -10,9 +10,10 @@ using System;
 namespace MyCore.Migrations
 {
     [DbContext(typeof(MyCoreContext))]
-    partial class MyCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20181015014054_editgoodid")]
+    partial class editgoodid
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -531,17 +532,12 @@ namespace MyCore.Migrations
 
                     b.Property<decimal?>("GiveSum");
 
-                    b.Property<DateTime?>("SHDate");
-
-                    b.Property<string>("SHName")
-                        .HasMaxLength(45);
-
-                    b.Property<int?>("Status");
-
                     b.Property<string>("SellName")
                         .HasMaxLength(45);
 
                     b.Property<int>("SellNameID");
+
+                    b.Property<int?>("Status");
 
                     b.Property<string>("StoreName")
                         .HasMaxLength(45);

@@ -1,8 +1,9 @@
 ﻿
 @{
-    ViewData["Title"] = "AddBuyReturnIndex";
+    ViewData["Title"] = "AddEditSellIndex";
     Layout = "~/Views/Share/_LayoutBody.cshtml";
 }
+
 
 <style>
     #bottomField {
@@ -47,9 +48,9 @@
                             <div class="layui-input-inline" style="width:140px">
                                 <input type="text" name="BillDate" class="layui-input" id="BillDate">
                             </div>
-                            <label class="layui-form-label">出库员</label>
+                            <label class="layui-form-label">销售员</label>
                             <div class="layui-input-inline" style="width:140px">
-                                <select id="YSName" name="YSName" lay-search lay-verify="required">
+                                <select id="SellName" name="SellName" lay-search lay-verify="required">
                                     <option value="">==请选择==</option>
                                 </select>
                             </div>
@@ -61,11 +62,15 @@
                             </div>
                         </div>
                         <div class="layui-form-item">
-                            <label class="layui-form-label">供应商</label>
+                            <label class="layui-form-label">客户</label>
                             <div class="layui-input-inline" style="width:140px">
                                 <select id="SupName" name="SupName" lay-search lay-verify="required">
                                     <option value="">==请选择==</option>
                                 </select>
+                            </div>
+                            <label class="layui-form-label">快递费</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <input type="number" name="GiveSum" class="layui-input" id="GiveSum" >
                             </div>
                             <label class="layui-form-label">总金额</label>
                             <div class="layui-input-inline" style="width:140px">
@@ -85,10 +90,10 @@
     </div>
 </div>
 <div id="bottomField">
-    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Empty" id="Empty"><i class="layui-icon">&#xe6b1;</i>清空</button>
-    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="SaveAdd" id="SaveAdd"><i class="layui-icon">&#xe61f;</i>保存并新增</button>
-    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="AddClose" id="AddClose"><i class="layui-icon ">&#xe608;</i>保存</button>
-    <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="AddSH" id="AddSH"><i class="layui-icon ">&#xe672;</i>保存并审核</button>
+    <button type="button" class="layui-btn layui-btn-sm" data-type="Empty" id="Empty"><i class="layui-icon">&#xe6b1;</i>清空</button>
+    <button type="button" class="layui-btn layui-btn-sm" data-type="SaveAdd" id="SaveAdd"><i class="layui-icon">&#xe61f;</i>保存并新增</button>
+    <button type="button" class="layui-btn layui-btn-sm" data-type="AddClose" id="AddClose"><i class="layui-icon ">&#xe608;</i>保存</button>
+    <button type="button" class="layui-btn layui-btn-sm" data-type="AddSH" id="AddSH"><i class="layui-icon ">&#xe672;</i>保存并过账</button>
 </div>
 <script>
     var keyValuetypes = $.request("types");//判断是新增或修改
@@ -113,16 +118,12 @@
                     }
                 },
                 { label: '主键id', name: 'id', index: 'id', width: 100, align: 'center', hidden: true },
-                { label: '库存行id', name: 'OrderRow', index: 'OrderRow', width: 100, align: 'center', hidden: true },
-                { label: '商品id', name: 'Good_id', index: 'Good_id', width: 100, align: 'center', hidden: true},
+                { label: '库存行id', name: 'StoreRow', index: 'StoreRow', width: 100, align: 'center', hidden: true },
+                { label: '商品id', name: 'Good_id', index: 'Good_id', width: 100, align: 'center', hidden: true },
                 { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 100, align: 'center'},
                 { label: '*商品名称', name: 'GoodName', index: 'GoodName', width: 140, align: 'center' },
                 { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
                 { label: '规格', name: 'GGType', index: 'GGType', width: 100, align: 'center' },
-                { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
-                { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center'},
-                { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center', },
-                { label: '有效期至', name: 'yxqDate', index: 'yxqDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' },width: 100, align: 'center',},
                 {
                     label: '*数量', name: 'Num', index: 'Num', width: 100, align: 'center', editable: true,
                     editrules: {
@@ -130,11 +131,22 @@
                     }
 
                 },
-                { label: '单价', name: 'Price', index: 'Price', width: 100, align: 'center', },
-                { label: '金额', name: 'Sum', index: 'Sum', width: 100, align: 'center' },
+                {
+                    label: '*销售单价', name: 'SellPrice', index: 'SellPrice', width: 100, align: 'center', editable: true,
+                    editrules: {
+                        edithidden: true, number: true, minValue: 0
+                    }
+
+                },
+                { label: '销售金额', name: 'Sum', index: 'Sum', width: 100, align: 'center' },
+                { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
+                { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center'},
+                { label: '生产日期', name: 'scDate', index: 'scDate', width: 100, align: 'center', },
+                {label: '有效期至', name: 'yxqDate', index: 'yxqDate', width: 100, align: 'center',},              
+                { label: '进货单价', name: 'InPrice', index: 'InPrice', width: 100, align: 'center', },                           
                 { label: '型号', name: 'ModelType', index: 'ModelType', width: 100, align: 'center' },
                 { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 100, align: 'center' },
-                { label: '备注', name: 'BZ', index: 'BZ', width: 140, align: 'center' },
+                { label: '备注', name: 'BZ', index: 'BZ', width: 140, align: 'center', editable: true, },
 
             ],
             width: "100%",
@@ -165,7 +177,8 @@
                 "GGType": '',
                 "ModelType": '',
                 "SCCJ": '',
-                "Price": '',
+                "InPrice": '',
+                "SellPrice": '',
                 "Num": '',
                 "Sum": '',
                 "BZ": ''
@@ -180,22 +193,22 @@
                 , table = layui.table;
 
             var strdate = new Date().Format("yyyy-MM-dd");
-            //采购员
-            $("#YSName").bindSelect({
-                url: "/OrderBill/GetUser",
+            //销售员
+            $("#SellName").bindSelect({
+                url: "/Sell/GetUser",
                 id: "id",
                 text: "UserName"
             });
-            //供应商
+            //客商
             $("#SupName").bindSelect({
-                url: "/OrderBill/GetSup",
+                url: "/Sell/GetSup",
                 id: "id",
                 text: "SupName"
             });
 
             //仓库
             $("#StoreName").bindSelect({
-                url: "/InStore/GetStoreInfo",
+                url: "/Sell/GetStoreInfo",
                 id: "id",
                 text: "StoreName"
             });
@@ -216,47 +229,49 @@
             else if (keyValuetypes == "edit") {
                 if (!!keyValueids) {
                     $.ajax({
-                        url: "/BuyReturn/GetBillList",
+                        url: "/Sell/GetBillList",
                         data: { ids: keyValueids },
                         dataType: "json",
                         async: false,
                         success: function (datas) {
-                            var instorebill = datas.bills;
-                            var instorebill_mx = datas.bills.inStoreBill_MX;
-                            $("#YSName").val(instorebill.ysNameID);
-                            $("#SupName").val(instorebill.sup_id);
-                            var BillDates = instorebill.billDate.toString().substring(0, 10);
+                            var sellbill = datas.bills;
+                            var sellbill_mx = datas.bills.sellBill_MX;
+                            $("#SellName").val(sellbill.sellNameID);
+                            $("#SupName").val(sellbill.sup_id);
+                            var BillDates = sellbill.billDate.toString().substring(0, 10);
                             $("#BillDate").val(BillDates);
-                            $("#StoreName").val(instorebill.stroeInfo_id);
-                            $("#Sum").val(instorebill.sum);
-                            $("#BZ").val(instorebill.bz);
-                            $.each(instorebill_mx, function (i) {
+                            $("#StoreName").val(sellbill.stroeInfo_id);
+                            $("#Sum").val(sellbill.sum);
+                            $("#GiveSum").val(sellbill.giveSum);
+                            $("#BZ").val(sellbill.bz);
+                            $.each(sellbill_mx, function (i) {
                                 var scdates = "";
                                 var yxqDate = "";
-                                if (instorebill_mx[i].scDate != null && instorebill_mx[i].scDate !=undefined) {
-                                    scdates = instorebill_mx[i].scDate.toString().substring(0, 10);
+                                if (sellbill_mx[i].scDate != null && sellbill_mx[i].scDate !=undefined) {
+                                    scdates = sellbill_mx[i].scDate.toString().substring(0, 10);
                                 }
-                                if (instorebill_mx[i].yxqDate != null && instorebill_mx[i].yxqDate != undefined) {
-                                    yxqDate = instorebill_mx[i].yxqDate.toString().substring(0, 10);
+                                if (sellbill_mx[i].yxqDate != null && sellbill_mx[i].yxqDate != undefined) {
+                                    yxqDate = sellbill_mx[i].yxqDate.toString().substring(0, 10);
                                 }
                                 var item = {
-                                    "id": instorebill_mx[i].id,
-                                    "OrderRow": instorebill_mx[i].orderRow,
-                                    "Good_id": instorebill_mx[i].good_id,
-                                    "GoodID": instorebill_mx[i].goodID,
-                                    "GoodName": instorebill_mx[i].goodName,
-                                    "DW": instorebill_mx[i].dw,
-                                    "GGType": instorebill_mx[i].ggType,
-                                    "ModelType": instorebill_mx[i].modelType,
-                                    "SCCJ": instorebill_mx[i].sccj,
-                                    "Price": instorebill_mx[i].price,
-                                    "Num": instorebill_mx[i].num,
-                                    "Sum": instorebill_mx[i].sum,
-                                    "SCPH": instorebill_mx[i].scph,
-                                    "MJPH": instorebill_mx[i].mjph,
+                                    "id": sellbill_mx[i].id,
+                                    "StoreRow": sellbill_mx[i].storeRow,
+                                    "Good_id": sellbill_mx[i].good_id,
+                                    "GoodID": sellbill_mx[i].goodID,
+                                    "GoodName": sellbill_mx[i].goodName,
+                                    "DW": sellbill_mx[i].dw,
+                                    "GGType": sellbill_mx[i].ggType,
+                                    "ModelType": sellbill_mx[i].modelType,
+                                    "SCCJ": sellbill_mx[i].sccj,
+                                    "InPrice": sellbill_mx[i].inPrice,
+                                    "SellPrice": sellbill_mx[i].sellPrice,
+                                    "Num": sellbill_mx[i].num,
+                                    "Sum": sellbill_mx[i].sum,
+                                    "SCPH": sellbill_mx[i].scph,
+                                    "MJPH": sellbill_mx[i].mjph,
                                     "scDate": scdates,
                                     "yxqDate": yxqDate,
-                                    "BZ": instorebill_mx[i].bz,
+                                    "BZ": sellbill_mx[i].bz,
                                 };
                                 AddRows(i + 1, item);
 
@@ -284,6 +299,7 @@
                     DelRow(i);
                 }
                 $("#Sum").val('');
+                $("#GiveSum").val('');
             });
             layueform = form;
             form.render();
@@ -298,13 +314,13 @@
             layer.msg("请选择仓库", { icon: 2 });
             return false;
         }
-        var url = "/BuyReturn/AddRowIndex" + "?ids=" + ids +"&StroeInfo_id=" + StroeInfo_id;
-        $.FromOpen('BuyReturnFromAddRow', '选择商品库存信息', url, '600px', '500px', '1000');
+        var url = "/Sell/AddRowIndex" + "?ids=" + ids +"&StroeInfo_id=" + StroeInfo_id;
+        $.FromOpen('SellFromAddRow', '选择商品库存信息', url, '600px', '500px', '1000');
     };
 
     //新增一行商品库存
     function GoodsAddRows(ids, item) {
-        $("#list1").jqGrid('setCell', ids, 'OrderRow', item.id);
+        $("#list1").jqGrid('setCell', ids, 'StoreRow', item.id);
         $("#list1").jqGrid('setCell', ids, 'Good_id', item.Good_id);
         $("#list1").jqGrid('setCell', ids, 'GoodID', item.GoodID);
         $("#list1").jqGrid('setCell', ids, 'GoodName', item.GoodName);
@@ -312,10 +328,10 @@
         $("#list1").jqGrid('setCell', ids, 'GGType', item.GGType);
         $("#list1").jqGrid('setCell', ids, 'ModelType', item.ModelType);
         $("#list1").jqGrid('setCell', ids, 'SCCJ', item.SCCJ);
-        $("#list1").jqGrid('setCell', ids, 'Price', item.Price);
-        $("#list1").jqGrid('setCell', ids, 'Num', item.Num);
-        var sum = Number(item.Num) * Number(item.Price);
-        $("#list1").jqGrid('setCell', ids, 'Sum', sum);
+        $("#list1").jqGrid('setCell', ids, 'InPrice', item.InPrice);
+        $("#list1").jqGrid('setCell', ids, 'SellPrice', item.SellPrice);
+        $("#list1").jqGrid('setCell', ids, 'Num', 1);
+        $("#list1").jqGrid('setCell', ids, 'Sum', item.SellPrice);
         $("#list1").jqGrid('setCell', ids, 'SCPH', item.SCPH);
         $("#list1").jqGrid('setCell', ids, 'MJPH', item.MJPH);
         $("#list1").jqGrid('setCell', ids, 'scDate', item.scDate);
@@ -326,7 +342,7 @@
     //加载出库单
     function AddRows(ids, item) {
         //$("#list1").jqGrid('setCell', ids, 'id', item.id);
-        $("#list1").jqGrid('setCell', ids, 'OrderRow', item.OrderRow);
+        $("#list1").jqGrid('setCell', ids, 'StoreRow', item.StoreRow);
         $("#list1").jqGrid('setCell', ids, 'Good_id', item.Good_id);
         $("#list1").jqGrid('setCell', ids, 'GoodID', item.GoodID);
         $("#list1").jqGrid('setCell', ids, 'GoodName', item.GoodName);
@@ -334,7 +350,8 @@
         $("#list1").jqGrid('setCell', ids, 'GGType', item.GGType);
         $("#list1").jqGrid('setCell', ids, 'ModelType', item.ModelType);
         $("#list1").jqGrid('setCell', ids, 'SCCJ', item.SCCJ);
-        $("#list1").jqGrid('setCell', ids, 'Price', item.Price);
+        $("#list1").jqGrid('setCell', ids, 'InPrice', item.InPrice);
+        $("#list1").jqGrid('setCell', ids, 'SellPrice', item.SellPrice);
         $("#list1").jqGrid('setCell', ids, 'Num', item.Num);
         $("#list1").jqGrid('setCell', ids, 'Sum', item.Sum);
         $("#list1").jqGrid('setCell', ids, 'SCPH', item.SCPH);
@@ -345,7 +362,7 @@
     };
     //删除一行商品信息
     function DelRow(ids) {
-        $("#list1").jqGrid('setCell', ids, 'OrderRow', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'StoreRow', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'Good_id', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'GoodID', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'GoodName', "&nbsp");
@@ -353,7 +370,8 @@
         $("#list1").jqGrid('setCell', ids, 'GGType', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'ModelType', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'SCCJ', "&nbsp");
-        $("#list1").jqGrid('setCell', ids, 'Price', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'InPrice', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'SellPrice', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'SCPH', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'MJPH', "&nbsp");
         $("#list1").jqGrid('setCell', ids, 'scDate', "&nbsp");
@@ -365,17 +383,15 @@
 
     $(function () {
         $.hands = {
-     
             //清空
             Empty: function () {
                 for (var i = 1; i <= 15; i++) {
                     DelRow(i);
                 }
                 $("#SupName").val('');
-                $("#OrderBill_id").val('');
-                $("#OrderBillID").val('');
                 $("#Sum").val('');
-                $("#YSName").val('');
+                $("#GiveSum").val('');
+                $("#SellName").val('');
                 $("#StoreName").val('');
                 layueform.render('select');
             },
@@ -418,14 +434,14 @@
                     layer.msg("请选择日期", { icon: 2 });
                     return false;
                 }
-                //选择采购员判断
-                var YSNameID = $('#YSName').val();
-                if (YSNameID == "" || YSNameID == undefined || YSNameID == null) {
-                    layer.msg("请选择验收员", { icon: 2 });
+                //选择销售员判断
+                var SellNameID = $('#SellName').val();
+                if (SellNameID == "" || SellNameID == undefined || SellNameID == null) {
+                    layer.msg("请选择销售员", { icon: 2 });
                     return false;
                 }
-                var YSName = $("#YSName option:selected").text();
-                //选择采购员判断
+                var SellName = $("#SellName option:selected").text();
+                //选择销售员判断
                 var StroeInfo_id = $('#StoreName').val();
                 if (StroeInfo_id == "" || StroeInfo_id == undefined || StroeInfo_id == null) {
                     layer.msg("请选择仓库", { icon: 2 });
@@ -436,12 +452,12 @@
                    //选择供应商判断
                 var Sup_id = $('#SupName').val();
                 if (Sup_id == "" || Sup_id == undefined || Sup_id == null) {
-                    layer.msg("请选择供应商", { icon: 2 });
+                    layer.msg("请选择客户", { icon: 2 });
                     return false;
                 }
                 var SupName = $("#SupName option:selected").text();
 
-             
+
                 var BZ = $('#BZ').val();
                 //明细数据
                 var AddData = [];
@@ -456,7 +472,7 @@
                         var rowsum = 0;
                         //判断单价数量是否为空或者数量为0
                         var datanum = Number(row.Num);
-                        var dataPrice = Number(row.Price);
+                        var dataPrice = Number(row.SellPrice);
                         var dataSum = Number(row.Sum);
                         if (isNaN(datanum)|| isNaN(dataPrice)) {
                             dataFlag = false;
@@ -482,23 +498,28 @@
 
                 }
                 $("#Sum").val(sums);
+      
+                var GiveSums = $("#GiveSum").val();
+
                 if (AddData.length > 0) {
                     var Bill = {
                         "BillDate": BillDate,
                         "StroeInfo_id": StroeInfo_id,
                         "StoreName": StoreName,
-                        "YSNameID": YSNameID,
-                        "YSName": YSName,
+                        "SellNameID": SellNameID,
+                        "SellName": SellName,
                         "Sup_id": Sup_id,
                         "SupName": SupName,
+                        "Sum": sums,
+                        "GiveSum": GiveSums,
                         "BZ": BZ
                     };
                     var flag = false;
                     if (BillType == "add") {
                         $.loading(true, "正在提交数据");
                         $.ajax({
-                            url: "/BuyReturn/SaveBill",
-                            data: { SHType: SHType, InStoreBills: Bill, InStoreBills_MX: AddData },
+                            url: "/Sell/SaveBill",
+                            data: { SHType: SHType, SellBills: Bill, SellBills_MX: AddData },
                             dataType: "json",
                             type: "post",
                             async: false,
@@ -531,8 +552,8 @@
                     else {
                         $.loading(true, "正在提交数据");
                         $.ajax({
-                            url: "/BuyReturn/EditBill",
-                            data: { ids: keyValueids, SHType: SHType, InStoreBills: Bill, InStoreBills_MX: AddData },
+                            url: "/Sell/EditBill",
+                            data: { ids: keyValueids, SHType: SHType, SellBills: Bill, SellBills_MX: AddData },
                             dataType: "json",
                             type: "post",
                             async: false,
@@ -606,7 +627,7 @@
     $(document).on('keyup', '#list1>tbody>tr>td>input[type="text"]', function () {
         var _inputName = $(this).attr('name');
 
-        if (_inputName == "Price") {
+        if (_inputName == "SellPrice") {
             var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
             var rowData = $("#list1").jqGrid("getRowData", id);
             var _price = Number($(this).val());
@@ -621,7 +642,7 @@
         } else if (_inputName == "Num") {
             var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
             var rowData = $("#list1").jqGrid("getRowData", id);
-            var _price = Number(rowData.Price);
+            var _price = Number(rowData.SellPrice);
             var _num = Number($(this).val());
             if (isNaN(_num)) {
                 _num = 0;
@@ -641,6 +662,8 @@
         vertical-align: middle
     }
 </style>
+
+
 
 
 

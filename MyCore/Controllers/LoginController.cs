@@ -13,12 +13,12 @@ namespace MyCore.Controllers
     public class LoginController : Controller
     {
    
-        private MyCoreContext conn;
-       
+        private MyCoreContext conn;     
         public LoginController(MyCoreContext _conn)
         {
             conn = _conn;
         }
+
         public IActionResult Index()
         {
             HttpContext.Session.Clear();
@@ -35,13 +35,12 @@ namespace MyCore.Controllers
                 HttpContext.Session.SetString("LoginName", users.LoginName);
                 HttpContext.Session.SetString("LoginPWD", users.LoginPWD);
                 HttpContext.Session.SetString("UserID", users.UserID);
-                HttpContext.Session.SetString("UserName", users.UserName);             
+                HttpContext.Session.SetString("UserName", users.UserName);    
+                
                 return Json(new { status = 1, jumpurl = "/Main/main/" });
             }
             return Json(new { status = 2, errorMessage = "用户不存在或密码错误" });
         }
-
-     
 
         private IActionResult RedirectToLocal(string returnUrl)
         {
@@ -54,5 +53,8 @@ namespace MyCore.Controllers
                 return RedirectToAction(nameof(LoginController.Index), "Index");
             }
         }
+
+
+
     }
 }

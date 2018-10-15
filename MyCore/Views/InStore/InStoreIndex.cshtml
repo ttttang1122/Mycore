@@ -59,9 +59,9 @@
             },
             colModel: [
                 { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true},
-                { label: '单据日期', name: 'BillDate', index: 'BillDate', width: 100, align: 'center'},
+                { label: '单据日期', name: 'BillDate', index: 'BillDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center'},
                 { label: '入库单号', name: 'BillID', index: 'BillID', width: 180, align: 'center' },
-                { label: '验收员', name: 'CGName', index: 'CGName', width:80, align: 'center'},
+                { label: '验收员', name: 'YSName', index: 'YSName', width:80, align: 'center'},
                 { label: '供应商', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
                 { label: '仓库', name: 'StoreName', index: 'StoreName', width: 120, align: 'center' },
                 { label: '金额', name: 'Sum', index: 'Sum', width: 120, align: 'center' },
@@ -79,6 +79,7 @@
                 },
                 { label: '制单人', name: 'CreateName', index: 'CreateName', width: 100, align: 'center' },
                 { label: '审核人', name: 'SHName', index: 'SHName', width: 100, align: 'center' },
+                { label: '关联订单号', name: 'OrderBillID', index: 'OrderBillID', width: 100, align: 'center' },
 
             ],
             width: "99%",
@@ -120,8 +121,8 @@
                         { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 75, align: 'center' },
                         { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 75, align: 'center' },
                         { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 75, align: 'center' },
-                        { label: '生产日期', name: 'scDate', index: 'scDate', width: 75, align: 'center' },
-                        { label: '有效期至', name: 'yxqDate', index: 'yxqDate', width: 75, align: 'center' },
+                        { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 75, align: 'center' },
+                        { label: '有效期至', name: 'yxqDate', index: 'yxqDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' },width: 75, align: 'center' },
                         { label: '单价', name: 'Price', index: 'Price', width: 75, align: 'center' },
                         { label: '数量', name: 'Num', index: 'Num', width: 80, align: 'center' },
                         { label: '金额', name: 'Sum', index: 'Sum', width: 80, align: 'center' },
@@ -129,6 +130,9 @@
                     ],
                     jsonReader: {   // (8)针对子表格的jsonReader设置
                         repeatitems: false
+                    },
+                    loadComplete: function (xhr) {  //隐藏滚动条
+                        $("#" + subgrid_table_id).closest(".ui-jqgrid-bdiv").css({ 'overflow-y': 'hidden' });
                     },
                     width: "100%",
                     autowidth: true,

@@ -6,10 +6,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-
-namespace MyCore.Models.CGData
+namespace MyCore.Models.SellData
 {
-    public class InStoreBill_MX
+    public class SellBill_MX
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -23,14 +22,14 @@ namespace MyCore.Models.CGData
         /// </summary>
         public int? StroeInfo_id { get; set; }
         /// <summary>
-        /// 仓库ID
+        /// 仓库名称
         /// </summary>
         [StringLength(45)]
         public string StoreName { get; set; }
         /// <summary>
-        /// 订单对应行号
+        /// 单据对应库存行号
         /// </summary>
-        public int? OrderRow { get; set; }
+        public int? StoreRow { get; set; }
         /// <summary>
         /// 商品id
         /// </summary>
@@ -68,7 +67,11 @@ namespace MyCore.Models.CGData
         /// <summary>
         /// 进货价
         /// </summary>
-        public decimal Price { get; set; }
+        public decimal InPrice { get; set; }
+        /// <summary>
+        /// 销售价
+        /// </summary>
+        public decimal SellPrice { get; set; }
         /// <summary>
         /// 数量
         /// </summary>
@@ -104,6 +107,7 @@ namespace MyCore.Models.CGData
         [JsonIgnore]
         [IgnoreDataMember]
         [ForeignKey("Bill_id")]
-        public virtual InStoreBill InStoreBill { get; set; }
+        public virtual SellBill SellBill { get; set; }
+
     }
 }

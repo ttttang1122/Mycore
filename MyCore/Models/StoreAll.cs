@@ -4,33 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.Serialization;
-using Newtonsoft.Json;
 
-namespace MyCore.Models.CGData
+namespace MyCore.Models
 {
-    public class InStoreBill_MX
+    public class StoreAll
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+     
         public int id { get; set; }
         /// <summary>
-        /// 主表主键
+        /// 仓库编号
         /// </summary>
-        public int Bill_id { get; set; }
+        public int Store_id { get; set; }
         /// <summary>
-        /// 仓库ID
-        /// </summary>
-        public int? StroeInfo_id { get; set; }
-        /// <summary>
-        /// 仓库ID
+        /// 仓库名称
         /// </summary>
         [StringLength(45)]
         public string StoreName { get; set; }
-        /// <summary>
-        /// 订单对应行号
-        /// </summary>
-        public int? OrderRow { get; set; }
         /// <summary>
         /// 商品id
         /// </summary>
@@ -66,17 +55,17 @@ namespace MyCore.Models.CGData
         [StringLength(145)]
         public string SCCJ { get; set; }
         /// <summary>
-        /// 进货价
+        /// 进单价
         /// </summary>
-        public decimal Price { get; set; }
+        public decimal InPrice { get; set; }
         /// <summary>
-        /// 数量
+        /// 销售价
+        /// </summary>
+        public decimal SellPrice { get; set; }
+        /// <summary>
+        /// 库存数量
         /// </summary>
         public decimal Num { get; set; }
-        /// <summary>
-        /// 金额
-        /// </summary>
-        public decimal Sum { get; set; }
         /// <summary>
         /// 生产批号
         /// </summary>
@@ -89,7 +78,7 @@ namespace MyCore.Models.CGData
         public string MJPH { get; set; }
         /// <summary>
         /// 生产日期
-        /// </summary>   
+        /// </summary>    
         public DateTime? scDate { get; set; }
         /// <summary>
         /// 有效期至
@@ -100,10 +89,5 @@ namespace MyCore.Models.CGData
         /// </summary>
         [StringLength(200)]
         public string BZ { get; set; }
-
-        [JsonIgnore]
-        [IgnoreDataMember]
-        [ForeignKey("Bill_id")]
-        public virtual InStoreBill InStoreBill { get; set; }
     }
 }

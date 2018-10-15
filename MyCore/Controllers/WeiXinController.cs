@@ -9,8 +9,15 @@ namespace MyCore.Controllers
 {
     [Produces("application/json")]
     [Route("api/WeiXin")]
-    public class WeiXinController : Controller
+    public class WeiXinController : BaseApiController
     {
+
+        [Route("test"),HttpGet]
+        public object test(string name)
+        {
+            var names = name + 1;
+            return names;
+        }
 
     }
 }

@@ -59,7 +59,7 @@
             },
             colModel: [
                 { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true},
-                { label: '单据日期', name: 'BillDate', index: 'BillDate', width: 100, align: 'center'},
+                { label: '单据日期', name: 'BillDate', index: 'BillDate', formatter:"date", formatoptions: {newformat:'Y-m-d'}, width: 100, align: 'center'},
                 { label: '订单号', name: 'BillID', index: 'BillID', width: 180, align: 'center' },
                 { label: '采购员', name: 'CGName', index: 'CGName', width:120, align: 'center'},
                 { label: '供应商', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
@@ -146,6 +146,9 @@
                     ],
                     jsonReader: {   // (8)针对子表格的jsonReader设置
                         repeatitems: false
+                    },
+                    loadComplete: function (xhr) {  //隐藏滚动条
+                        $("#" + subgrid_table_id).closest(".ui-jqgrid-bdiv").css({ 'overflow-y': 'hidden' });
                     },
                     width: "100%",
                     autowidth: true,

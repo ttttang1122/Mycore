@@ -1,0 +1,251 @@
+﻿
+@{
+    ViewData["Title"] = "SellReportIndex";
+    Layout = "~/Views/Share/_LayoutBody.cshtml";
+}
+
+
+
+<div class="list-wall">
+    <div class="list-top">
+        <div class="layui-btn-group">
+            <form class="layui-form">
+                <div class="layui-form-item" style="margin-bottom:5px">
+                    <div class="layui-input-inline" style="width:100px">
+                        <select id="StrSearchType" name="query" lay-verify="required">
+                            <option value="0">单据编号</option>
+                            <option value="1">销售员</option>
+                            <option value="2">制单人</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <input type="text" id="StrSearch" name="title" required lay-verify="required" autocomplete="off" class="layui-input" style="width:200px;">
+                    </div>
+                    <div class="layui-input-inline" style="padding-left:10px">
+                        <button type="button" authorize="yes" class="layui-btn layui-btn-xs layui-btn-normal" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i> 查询</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="layui-btn-group" style="float:right">
+            <button type="button" authorize="yes" class="layui-btn layui-btn-xs" data-type="Excel" id="Excel"><i class="layui-icon ">&#xe601;</i> 导出</button>
+        </div>
+
+
+
+    </div>
+    <div class="gridPanel">
+        <table id="list1" class="table table-condensed"></table>
+        <div id="pager1"></div>
+    </div>
+</div>
+<script>$('.list-top').authorizeButton()</script>
+<script>
+    var CX_StrSearch = "";
+    var CX_StrSearchType=""
+    var bodyheight = 0;
+    $(function () {
+        bodyheight = document.body.scrollHeight;
+        $("#list1").jqGrid({
+            styleUI: 'Bootstrap',
+            url: '/SellReport/SellList',
+            datatype: "json",
+            jsonReader: {
+                repeatitems: false
+            },
+            colModel: [
+                { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true },
+                { label: '单据日期', name: 'BillDate', index: 'BillDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
+                {
+                    label: '单据类型', name: 'BillType', index: 'BillType', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
+                        if (cellvalue == "SR") {
+                            return '<span class="layui-badge layui-bg-red">销售退回</span>';
+                        } else if (cellvalue == "SE") {
+                            return '<span class="layui-badge layui-bg-green">销售开单</span>';
+                        } else {
+                            return '<span class="layui-badge layui-bg-orange">未知</span>';
+                        }
+                    }
+                },
+                { label: '单据编号', name: 'BillID', index: 'BillID', width: 180, align: 'center' },
+                { label: '销售员', name: 'SellName', index: 'SellName', width: 80, align: 'center' },
+                { label: '客户', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
+                { label: '仓库', name: 'StoreName', index: 'StoreName', width: 120, align: 'center' },
+                { label: '金额', name: 'Sum', index: 'Sum', width: 120, align: 'center' },
+                { label: '快递费', name: 'GiveSum', index: 'GiveSum', width: 120, align: 'center' },
+                { label: '备注', name: 'BZ', index: 'BZ', width: 100, align: 'center' },
+                {
+                    label: '状态', name: 'Status', index: 'Status', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
+                        if (cellvalue == "0") {
+                            return '<span class="layui-badge layui-bg-red">草稿</span>';
+                        } else if (cellvalue == "1") {
+                            return '<span class="layui-badge layui-bg-green">已过账</span>';
+                        } else {
+                            return '<span class="layui-badge layui-bg-orange">未知</span>';
+                        }
+                    }
+                },
+                { label: '制单人', name: 'CreateName', index: 'CreateName', width: 100, align: 'center' },
+            ],
+            width: "99%",
+            autowidth: true,
+            height: $(window).height() - 110,
+            rowNum: 30,//一页显示多少条
+            rowList: [10, 20, 30, 50, 100],//可供用户选择一页显示多少条
+            pager: '#pager1',//表格页脚的占位符(一般是div)的id
+            sortname: 'id',//初始化的时候排序的字段
+            sortorder: "desc",//排序方式,可选desc,asc
+            mtype: "post",//向后台请求数据的ajax的类型。可选post,get
+            viewrecords: true,
+            shrinkToFit: false,
+            rownumbers: true,
+            subGrid: true,  // (1)开启子表格支持
+            subGridRowExpanded: function (subgrid_id, row_id) {  // (2)子表格容器的id和需要展开子表格的行id，将传入此事件函数
+                var subgrid_table_id;
+                subgrid_table_id = subgrid_id + "_t";   // (3)根据subgrid_id定义对应的子表格的table的id
+
+                var subgrid_pager_id;
+                subgrid_pager_id = subgrid_id + "_pgr"  // (4)根据subgrid_id定义对应的子表格的pager的id
+
+                // (5)动态添加子报表的table和pager
+                $("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table><div id='" + subgrid_pager_id + "' class='scroll'></div>");
+
+                //$("#" + subgrid_id).html("<table id='" + subgrid_table_id + "' class='scroll'></table>");
+
+                // (6)创建jqGrid对象
+                $("#" + subgrid_table_id).jqGrid({
+                    url: "/SellReport/SellBill_MXList?&id=" + row_id,  // (7)子表格数据对应的url，注意传入的contact.id参数
+                    datatype: "json",
+                    styleUI: 'Bootstrap',
+                    colModel: [
+                        { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true },
+                        { label: '商品名称', name: 'GoodName', index: 'GoodName', width: 140, align: 'center' },
+                        { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
+                        { label: '规格', name: 'GGType', index: 'GGType', width: 100, align: 'center' },
+                        { label: '型号', name: 'ModelType', index: 'ModelType', width: 75, align: 'center' },
+                        { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 120, align: 'center' },
+                        { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
+                        { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center' },
+                        { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 75, align: 'center' },
+                        { label: '有效期至', name: 'yxqDate', index: 'yxqDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' },width: 75, align: 'center' },
+                        { label: '进货单价', name: 'InPrice', index: 'InPrice', width: 75, align: 'center' },
+                        { label: '单价', name: 'SellPrice', index: 'SellPrice', width: 75, align: 'center' },
+                        { label: '数量', name: 'Num', index: 'Num', width: 80, align: 'center' },
+                        { label: '金额', name: 'Sum', index: 'Sum', width: 80, align: 'center' },
+                        { label: '备注', name: 'BZ', index: 'BZ', width: 80, align: 'center' },
+                    ],
+                    jsonReader: {   // (8)针对子表格的jsonReader设置
+                        repeatitems: false
+                    },
+                    loadComplete: function (xhr) {  //隐藏滚动条
+                        $("#" + subgrid_table_id).closest(".ui-jqgrid-bdiv").css({ 'overflow-y': 'hidden' });
+                        $("#" + subgrid_table_id).closest(".ui-jqgrid-view").css({ 'overflow-x': 'hidden' });
+                    },
+                    width: "100%",
+                    autowidth: true,
+                    mtype: "post",
+                    rowNum: 20,
+                    rowList: [10, 20, 30, 50, 100],
+                    pager: subgrid_pager_id,
+                    sortname: 'id',
+                    sortorder: "asc",
+                    height: '100%',
+                    rownumbers: true,
+                    shrinkToFit: false,
+
+                });
+            },
+            subGridRowColapsed: function (subgrid_id, row_id) {
+                // this function is called before removing the data
+                var subgrid_table_id;
+                subgrid_table_id = subgrid_id + "_t";
+                $("#" + subgrid_table_id).remove();
+            },
+        });
+        $(window).bind('resize', function () {
+            $("#list1").setGridWidth($(window).width() - 20);
+            $("#list1").setGridHeight($(window).height() - 110);
+        }).trigger('resize');
+
+    });
+    $(function () {
+        layui.use('form', function () {
+            var form = layui.form;
+            $('#StrSearchType').val(0);
+            form.render();
+        });
+    });
+
+    $(function () {
+        $.hands = {        
+            Search: function () {
+                $.loading(true, "正在查询数据");
+                CX_StrSearchType = $('#StrSearchType').val();
+                CX_StrSearch = $('#StrSearch').val();
+                window.setTimeout(function () {
+                    $("#list1").jqGrid('setGridParam', {
+                        datatype: 'json',
+                        postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch },
+                        //page: 1
+                    }).trigger("reloadGrid");
+
+                    $.loading(false);
+                }, 500);
+            },
+            Excel: function () {
+                $.loading(true, "正在提交数据");
+                window.setTimeout(function () {
+                    var funFrom = document.createElement("form");
+                    document.body.appendChild(funFrom);
+                    funFrom.action = '/SellReturn/GetFile/';
+                    funFrom.method = 'post';
+
+                    var total = $("#list1").jqGrid('getGridParam', 'records');
+                    if (parseInt(total) > 0) {
+                        var newStrSearchType = document.createElement("input");
+                        newStrSearchType.setAttribute("name", "StrSearchType");
+                        newStrSearchType.setAttribute("type", "hidden");
+                        newStrSearchType.setAttribute("value", CX_StrSearchType);
+
+                        var newStrSearch = document.createElement("input");
+                        newStrSearch.setAttribute("name", "StrSearch");
+                        newStrSearch.setAttribute("type", "hidden");
+                        newStrSearch.setAttribute("value", CX_StrSearch);
+
+                        funFrom.appendChild(newStrSearchType);
+                        funFrom.appendChild(newStrSearch);
+                        funFrom.submit();
+                    } else {
+                        top.layer.msg("空数据导出失败", { icon: 2 });
+                    }
+
+                }, 500);
+                $.loading(false);
+            },          
+            init: function () {              
+                $('#Search').on('click', $.hands.Search);
+                $('#Excel').on('click', $.hands.Excel);              
+            }
+        }
+        $(function () {
+            $.hands.init();
+        });
+    });
+
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

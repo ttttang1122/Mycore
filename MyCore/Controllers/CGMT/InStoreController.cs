@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyCore.Controllers.CGMT
 {
-    public class InStoreController : Controller
+    public class InStoreController : BaseController
     {
         private MyCoreContext conn;
         public InStoreController(MyCoreContext _conn)
@@ -371,6 +371,14 @@ namespace MyCore.Controllers.CGMT
 
             var InStoreBills = await conn.InStoreBill.FirstOrDefaultAsync(b => b.id == ids);
             var InStoreBills_MX = conn.InStoreBill_MX.Where(b => b.Bill_id == ids);
+            if (InStoreBills == null)
+            {
+                var jsons = new
+                {
+                    errorMsg = "反审失败,单据不存在!"
+                };
+                return Json(jsons);
+            }
             if (InStoreBills.SHStatus == 1)
             {
                 var jsons = new
@@ -481,11 +489,19 @@ namespace MyCore.Controllers.CGMT
             //
             var InStoreBills = await conn.InStoreBill.FirstOrDefaultAsync(b => b.id == ids);
             var InStoreBills_MX = conn.InStoreBill_MX.Where(b => b.Bill_id == ids);
+            if (InStoreBills == null)
+            {
+                var jsons = new
+                {
+                    errorMsg = "反审失败,单据不存在!"
+                };
+                return Json(jsons);
+            }
             if (InStoreBills.SHStatus == 0)
             {
                 var jsons = new
                 {
-                    errorMsg = "审核失败,单据未审核不可反审核!"
+                    errorMsg = "反审失败,单据未审核不可反审核!"
                 };
                 return Json(jsons);
             }
@@ -553,7 +569,14 @@ namespace MyCore.Controllers.CGMT
                 return Json(jsons);
             }
             var EditInStoreBills = await conn.InStoreBill.FirstOrDefaultAsync(b => b.id == ids);
-          
+            if (EditInStoreBills == null)
+            {
+                var jsons = new
+                {
+                    errorMsg = "修改失败,该单据不存在!"
+                };
+                return Json(jsons);
+            }
 
             var EditInStoreBills_MX = conn.InStoreBill_MX.Where(b => b.Bill_id == ids);
          
@@ -571,6 +594,9 @@ namespace MyCore.Controllers.CGMT
             EditInStoreBills.YSNameID = InStoreBills.YSNameID;
             EditInStoreBills.StroeInfo_id = InStoreBills.StroeInfo_id;
             EditInStoreBills.StoreName = InStoreBills.StoreName;
+            EditInStoreBills.Sup_id = InStoreBills.Sup_id;
+            EditInStoreBills.SupName = InStoreBills.SupName;
+            EditInStoreBills.BZ = InStoreBills.BZ;
             //更新明细
             foreach (var item in EditInStoreBills_MX)
             {

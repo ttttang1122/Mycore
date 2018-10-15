@@ -10,9 +10,10 @@ using System;
 namespace MyCore.Migrations
 {
     [DbContext(typeof(MyCoreContext))]
-    partial class MyCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20181011081642_ediesells")]
+    partial class ediesells
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -246,7 +247,8 @@ namespace MyCore.Migrations
                     b.Property<string>("GoodName")
                         .HasMaxLength(145);
 
-                    b.Property<int>("Good_id");
+                    b.Property<string>("Good_id")
+                        .HasMaxLength(145);
 
                     b.Property<string>("MJPH")
                         .HasMaxLength(100);
@@ -350,7 +352,8 @@ namespace MyCore.Migrations
                     b.Property<string>("GoodName")
                         .HasMaxLength(145);
 
-                    b.Property<int>("Good_id");
+                    b.Property<string>("Good_id")
+                        .HasMaxLength(145);
 
                     b.Property<string>("ModelType")
                         .HasMaxLength(45);
@@ -531,17 +534,12 @@ namespace MyCore.Migrations
 
                     b.Property<decimal?>("GiveSum");
 
-                    b.Property<DateTime?>("SHDate");
-
-                    b.Property<string>("SHName")
-                        .HasMaxLength(45);
-
-                    b.Property<int?>("Status");
-
                     b.Property<string>("SellName")
                         .HasMaxLength(45);
 
                     b.Property<int>("SellNameID");
+
+                    b.Property<int?>("Status");
 
                     b.Property<string>("StoreName")
                         .HasMaxLength(45);
@@ -582,7 +580,8 @@ namespace MyCore.Migrations
                     b.Property<string>("GoodName")
                         .HasMaxLength(145);
 
-                    b.Property<int>("Good_id");
+                    b.Property<string>("Good_id")
+                        .HasMaxLength(145);
 
                     b.Property<decimal>("InPrice");
 
@@ -642,7 +641,8 @@ namespace MyCore.Migrations
                     b.Property<string>("GoodName")
                         .HasMaxLength(145);
 
-                    b.Property<int>("Good_id");
+                    b.Property<string>("Good_id")
+                        .HasMaxLength(145);
 
                     b.Property<string>("MJPH")
                         .HasMaxLength(100);

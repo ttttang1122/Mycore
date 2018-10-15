@@ -21,8 +21,7 @@ namespace MyCore.Models.CGData
         /// <summary>
         /// 商品id
         /// </summary>
-        [StringLength(145)]
-        public string Good_id { get; set; }
+        public int Good_id { get; set; }
         /// <summary>
         /// 商品编号
         /// </summary>

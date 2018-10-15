@@ -89,7 +89,7 @@ namespace MyCore.Controllers.CGGL
         [HttpGet]
         public async Task<IActionResult> GetSup()
         {
-            var sups = await conn.SupperInfo.ToListAsync();
+            var sups = await conn.SupperInfo.Where(b=>b.SupType==1||b.SupType==2 &&b.Status==1).ToListAsync();
             var data = sups.Select(p => new { p.id, p.SupName });
             return Content(data.ToJson());
         }

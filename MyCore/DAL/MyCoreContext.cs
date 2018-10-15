@@ -8,6 +8,7 @@ using MyCore.Models;
 using MyCore.Models.BaseData;
 using MyCore.Models.CGData;
 using MyCore.Models.Store;
+using MyCore.Models.SellData;
 namespace MyCore.DAL
 {
     public class MyCoreContext:DbContext
@@ -29,6 +30,8 @@ namespace MyCore.DAL
         public DbSet<InStoreBill> InStoreBill { get; set; }
         public DbSet<InStoreBill_MX> InStoreBill_MX { get; set; }
         public DbSet<GoodsStore> GoodsStore { get; set; }
+        public DbSet<SellBill> SellBill { get; set; }
+        public DbSet<SellBill_MX> SellBill_MX { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -45,6 +48,8 @@ namespace MyCore.DAL
             modelBuilder.Entity<InStoreBill>();
             modelBuilder.Entity<InStoreBill_MX>();
             modelBuilder.Entity<GoodsStore>();
+            modelBuilder.Entity<SellBill>();
+            modelBuilder.Entity<SellBill_MX>();
         }
     }
 }
