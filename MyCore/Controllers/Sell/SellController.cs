@@ -106,9 +106,24 @@ namespace MyCore.Controllers.Sell
         }
 
         [HttpPost]
-        public async Task<IActionResult> GoodsStoreList(string sidx, string sord, int page, int rows, int Store_id, string StrSearchType, string StrSearch)
+        public async Task<IActionResult> GoodsStoreList(string sidx, string sord, int page, int rows, int Store_id, string StrSearchType, string StrSearch,string Check)
         {
-            IQueryable<GoodsStore> bills = conn.GoodsStore.Where(b => b.Num > 0 && b.Store_id == Store_id);
+            IQueryable<GoodsStore> bills = conn.GoodsStore.Where(b => b.Store_id == Store_id);
+            if (!string.IsNullOrWhiteSpace(Check))
+            {
+                if (Check == "是")
+                {
+                    bills= bills.Where(b => b.Num >= 0);
+                }
+                else if(Check == "否")
+                {
+                    bills = bills.Where(b => b.Num > 0);
+                }
+            }
+            else
+            {
+                bills = bills.Where(b => b.Num > 0);
+            }
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
                 if (!string.IsNullOrWhiteSpace(StrSearch))

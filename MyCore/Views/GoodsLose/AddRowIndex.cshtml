@@ -4,8 +4,6 @@
     Layout = "~/Views/Share/_LayoutBody.cshtml";
 }
 
-
-
 <style>
     h2, .h2 {
         margin-top: 0px;
@@ -15,10 +13,12 @@
     .layui-form-item .layui-form-checkbox {
         margin-top: 0px;
     }
+
     .layui-form-checkbox {
         height: 20px;
         line-height: 20px;
     }
+
         .layui-form-checkbox i {
             height: 20px;
         }
@@ -40,9 +40,7 @@
                     <div class="layui-input-inline" style="padding-left:10px;width:100px;">
                         <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i> 查询</button>
                     </div>
-                    <div class="layui-input-inline" style="padding-right:10px;width:120px;">
-                        <input id="Zore" type="checkbox" name="Zore" title="显示零库存" lay-filter="Zore">
-                    </div>
+                  
                 </div>
             </form>
         </div>
@@ -58,7 +56,7 @@
        $(function () {
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
-            url: '/Sell/GoodsStoreList/?Store_id=' + keyValueStroeid,
+            url: '/GoodsLose/GoodsStoreList/?Store_id=' + keyValueStroeid,
             datatype: "json",
             jsonReader: {
                 repeatitems: false
@@ -72,10 +70,9 @@
                 { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
                 { label: '规格', name: 'GGType', index: 'GGType', width: 80, align: 'center' },
                 { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center' },
-                { label: '进货价', name: 'InPrice', index: 'InPrice', width: 100, align: 'center' },
-                { label: '销售价', name: 'SellPrice', index: 'SellPrice', width: 100, align: 'center' },             
                 { label: '型号', name: 'ModelType', index: 'ModelType', width: 80, align: 'center' },
-                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 180, align: 'center' },               
+                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 180, align: 'center' },
+                { label: '进货价', name: 'Price', index: 'Price', width: 100, align: 'center' },              
                 { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
                 { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center' },
                 { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
@@ -100,28 +97,7 @@
 
            layui.use('form', function () {
                var form = layui.form;
-               $('#StrSearchType').val(0);
-
-               form.on('checkbox(Zore)', function (obj) {
-                   var CX_Check = "否";
-                   if (obj.elem.checked) {
-                       CX_Check = "是";
-
-                   } else {
-                       CX_Check = "否";
-
-                   }
-
-                   CX_StrSearchType = $('#StrSearchType').val();
-                   CX_StrSearch = $('#StrSearch').val();
-                   $("#list1").jqGrid('setGridParam', {
-                       datatype: 'json',
-                       postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch, "Check": CX_Check },
-                       //page: 1
-                   }).trigger("reloadGrid");
-
-
-               });
+               $('#StrSearchType').val(0);           
                form.render();
            });
 
@@ -133,18 +109,12 @@
                 $.loading(true, "正在查询数据");
                 CX_StrSearchType = $('#StrSearchType').val();
                 CX_StrSearch = $('#StrSearch').val();
-                var CX_Check = "否";
-                var check = document.getElementById("Zore").checked;
-
-                if (check == true) {
-                    CX_Check = "是";
-                } else {
-                    CX_Check = "否";
-                }
+               
+              
                 window.setTimeout(function () {
                     $("#list1").jqGrid('setGridParam', {
                         datatype: 'json',
-                        postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch, "Check": CX_Check },
+                        postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch },
                         //page: 1
                     }).trigger("reloadGrid");
 
@@ -178,8 +148,7 @@
             "GGType": rowData.GGType,
             "ModelType": rowData.ModelType,
             "SCCJ": rowData.SCCJ,
-            "InPrice": rowData.InPrice,
-            "SellPrice": rowData.SellPrice,
+            "Price": rowData.Price,
             "Num": rowData.Num,
             "SCPH": rowData.SCPH,
             "MJPH": rowData.MJPH,
@@ -193,6 +162,8 @@
 
     }
 </script>
+
+
 
 
 

@@ -11,28 +11,27 @@ using MyCore.Models;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
-
-namespace MyCore.Controllers.Sell
+namespace MyCore.Controllers.Store
 {
-    public class SellReturnController : Controller
+    public class GoodsMoreController : Controller
     {
         private MyCoreContext conn;
 
-        public SellReturnController(MyCoreContext _conn)
+        public GoodsMoreController(MyCoreContext _conn)
         {
             conn = _conn;
         }
-        public IActionResult SellReturnIndex()
+        public IActionResult GoodsMoreIndex()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> SellList(string sidx, string sord, int page, int rows, string StrSearchType, string StrSearch)
+        public async Task<IActionResult> GoodsMoreList(string sidx, string sord, int page, int rows, string StrSearchType, string StrSearch)
         {
 
 
-            IQueryable<SellBill> bills = conn.SellBill.Where(b => b.BillType == "SR");
+            IQueryable<MoreLoseBill> bills = conn.MoreLoseBill.Where(b => b.BillType == "MR");
 
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
@@ -44,11 +43,11 @@ namespace MyCore.Controllers.Sell
                             bills = bills.Where(b => b.BillID.Contains(StrSearch));
                             break;
                         case "1":
-                            bills = bills.Where(b => b.SellName.Contains(StrSearch));
+                            bills = bills.Where(b => b.YSName.Contains(StrSearch));
 
                             break;
                         case "2":
-                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
+                            bills = bills.Where(b => b.CreateName.Contains(StrSearch));
 
                             break;
                         default:
@@ -60,61 +59,16 @@ namespace MyCore.Controllers.Sell
             }
 
             var lists = await bills.ToListAsync();
-            return lists.GetJson<SellBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill>());
+            return lists.GetJson<MoreLoseBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<MoreLoseBill>());
         }
 
         [HttpPost]
-        public async Task<IActionResult> SellBill_MXList(string sidx, string sord, int page, int rows, int id)
+        public async Task<IActionResult> GoodsMore_MXList(string sidx, string sord, int page, int rows, int id)
         {
-            var bills = await conn.SellBill_MX.Where(b => b.Bill_id == id).ToListAsync();
-            return bills.GetJson<SellBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill_MX>());
+            var bills = await conn.MoreLoseBill_MX.Where(b => b.Bill_id == id).ToListAsync();
+            return bills.GetJson<MoreLoseBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<MoreLoseBill_MX>());
 
         }
-
-        [HttpPost]
-        public async Task<IActionResult> SellChoose(string sidx, string sord, int page, int rows, string StrSearchType, string StrSearch)
-        {
-
-
-            IQueryable<SellBill> bills = conn.SellBill.Where(b => b.BillType == "SE");
-
-            if (!string.IsNullOrWhiteSpace(StrSearchType))
-            {
-                if (!string.IsNullOrWhiteSpace(StrSearch))
-                {
-                    switch (StrSearchType)
-                    {
-                        case "0":
-                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
-                            break;
-                        case "1":
-                            bills = bills.Where(b => b.SellName.Contains(StrSearch));
-
-                            break;
-                        case "2":
-                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
-
-                            break;
-                        default:
-
-                            break;
-                    }
-
-                }
-            }
-
-            var lists = await bills.ToListAsync();
-            return lists.GetJson<SellBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill>());
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> SellChoose_MXList(string sidx, string sord, int page, int rows, int id)
-        {
-            var bills = await conn.SellBill_MX.Where(b => b.Bill_id == id).ToListAsync();
-            return bills.GetJson<SellBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill_MX>());
-
-        }
-
 
         [HttpGet]
         public async Task<IActionResult> GetUser()
@@ -123,13 +77,7 @@ namespace MyCore.Controllers.Sell
             var data = users.Select(p => new { p.id, p.UserName });
             return Content(data.ToJson());
         }
-        [HttpGet]
-        public async Task<IActionResult> GetSup()
-        {
-            var sups = await conn.SupperInfo.Where(b => b.SupType == 0 || b.SupType == 2 && b.Status == 1).ToListAsync();
-            var data = sups.Select(p => new { p.id, p.SupName });
-            return Content(data.ToJson());
-        }
+
         [HttpGet]
         public async Task<IActionResult> GetStoreInfo()
         {
@@ -138,7 +86,7 @@ namespace MyCore.Controllers.Sell
             return Content(data.ToJson());
         }
 
-        public IActionResult AddEditSellReturnIndex()
+        public IActionResult AddEditGoodsMoreIndex()
         {
             return View();
         }
@@ -147,14 +95,8 @@ namespace MyCore.Controllers.Sell
         {
             return View();
         }
-
-        public IActionResult ChooseIndex()
-        {
-            return View();
-        }
-
         [HttpPost]
-        public async Task<IActionResult> GoodsStoreList(string sidx, string sord, int page, int rows, int Store_id, string StrSearchType, string StrSearch,string Check)
+        public async Task<IActionResult> GoodsStoreList(string sidx, string sord, int page, int rows, int Store_id, string StrSearchType, string StrSearch, string Check)
         {
             IQueryable<GoodsStore> bills = conn.GoodsStore.Where(b => b.Store_id == Store_id);
             if (!string.IsNullOrWhiteSpace(Check))
@@ -193,18 +135,14 @@ namespace MyCore.Controllers.Sell
                 }
             }
             var lisbills = await bills.ToListAsync();
-
-            List<StoreAll> sells = bills.Select(b => new StoreAll { id = b.id, Store_id = b.Store_id, StoreName = b.StoreName, Good_id = b.Good_id, GoodID = b.GoodID, GoodName = b.GoodName, DW = b.DW, GGType = b.GGType, ModelType = b.ModelType, SCCJ = b.SCCJ, InPrice = b.Price, Num = b.Num, SCPH = b.SCPH, MJPH = b.MJPH, scDate = b.scDate, yxqDate = b.yxqDate, BZ = b.BZ }).ToList();
-            var goods = conn.Goodinfo;
-            sells.ForEach(x => { x.SellPrice = goods.FirstOrDefault(b => b.id == x.Good_id).ShopPrice; });
-
-            return sells.GetJson<StoreAll>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<StoreAll>());
+   
+            return lisbills.GetJson<GoodsStore>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<GoodsStore>());
         }
 
         [HttpPost]
-        public async Task<IActionResult> SaveBill(string SHType, SellBill SellBills, List<SellBill_MX> SellBills_MX)
+        public async Task<IActionResult> SaveBill(string SHType, MoreLoseBill Bills, List<MoreLoseBill_MX> Bills_MX)
         {
-            if (SellBills == null)
+            if (Bills == null)
             {
                 var jsons = new
                 {
@@ -215,19 +153,19 @@ namespace MyCore.Controllers.Sell
 
             string UserID = HttpContext.Session.GetString("UserID");
             DateTime now = DateTime.Now;
-            SellBills.BillID = string.Concat("SR.", now.ToString("yyyyMMddHHmmsss"));
-            SellBills.BillType = "SR";
-            SellBills.CreateName = UserID;
-            SellBills.CreateDate = DateTime.Now;
-            SellBills.Status = 0;
-            SellBills.SellBill_MX = SellBills_MX;
+            Bills.BillID = string.Concat("MR.", now.ToString("yyyyMMddHHmmsss"));
+            Bills.BillType = "MR";
+            Bills.CreateName = UserID;
+            Bills.CreateDate = DateTime.Now;
+            Bills.Status = 0;
+            Bills.MoreLoseBill_MX = Bills_MX;
             if (SHType == "yes")
             {
-                SellBills.Status = 1;
-                SellBills.SHName = UserID;
-                SellBills.SHDate = now;
+                Bills.Status = 1;
+                Bills.SHName = UserID;
+                Bills.SHDate = now;
             }
-            foreach (var item in SellBills_MX)
+            foreach (var item in Bills_MX)
             {
                 if (item.Num == 0)
                 {
@@ -237,9 +175,9 @@ namespace MyCore.Controllers.Sell
                     };
                     return Json(json);
                 }
-                item.StroeInfo_id = SellBills.StroeInfo_id;
-                item.StoreName = SellBills.StoreName;
-                item.Sum = item.Num * item.SellPrice;
+                item.StroeInfo_id = Bills.StroeInfo_id;
+                item.StoreName = Bills.StoreName;
+                item.Sum = item.Num * item.Price;
                 //审核
                 if (SHType == "yes")
                 {
@@ -249,7 +187,7 @@ namespace MyCore.Controllers.Sell
                     {
                         stores.Num = stores.Num + item.Num;
 
-                      
+                        
                     }
                     else
                     {
@@ -267,9 +205,9 @@ namespace MyCore.Controllers.Sell
 
 
             }
-            SellBills.Sum = SellBills_MX.Sum(b => b.Sum);
+            Bills.Sum = Bills_MX.Sum(b => b.Sum);
 
-            conn.SellBill.Add(SellBills);
+            conn.MoreLoseBill.Add(Bills);
             try
             {
                 await conn.SaveChangesAsync();
@@ -293,10 +231,10 @@ namespace MyCore.Controllers.Sell
         public async Task<IActionResult> SHBill(int ids)
         {
 
-            var SellBills = await conn.SellBill.FirstOrDefaultAsync(b => b.id == ids);
+            var Bills = await conn.MoreLoseBill.FirstOrDefaultAsync(b => b.id == ids);
 
-            var SellBills_MX = conn.SellBill_MX.Where(b => b.Bill_id == ids);
-            if (SellBills == null)
+            var Bills_MX = conn.MoreLoseBill_MX.Where(b => b.Bill_id == ids);
+            if (Bills == null)
             {
                 var jsons = new
                 {
@@ -304,7 +242,7 @@ namespace MyCore.Controllers.Sell
                 };
                 return Json(jsons);
             }
-            if (SellBills.Status == 1)
+            if (Bills.Status == 1)
             {
                 var jsons = new
                 {
@@ -314,18 +252,19 @@ namespace MyCore.Controllers.Sell
             }
             string UserID = HttpContext.Session.GetString("UserID");
             DateTime now = DateTime.Now;
-            SellBills.Status = 1;
-            SellBills.SHName = UserID;
-            SellBills.SHDate = now;
+            Bills.Status = 1;
+            Bills.SHName = UserID;
+            Bills.SHDate = now;
 
-            foreach (var item in SellBills_MX)
+            foreach (var item in Bills_MX)
             {
                 //处理库存
                 var stores = await conn.GoodsStore.FirstOrDefaultAsync(b => b.id == item.StoreRow);
                 if (stores != null)
                 {
                     stores.Num = stores.Num + item.Num;
-                    
+
+                   
                 }
                 else
                 {
@@ -361,8 +300,8 @@ namespace MyCore.Controllers.Sell
         [HttpPost]
         public async Task<IActionResult> DeleteBill(int ids)
         {
-            var SellBills = await conn.SellBill.FirstOrDefaultAsync(b => b.id == ids);
-            if (SellBills == null)
+            var Bills = await conn.MoreLoseBill.FirstOrDefaultAsync(b => b.id == ids);
+            if (Bills == null)
             {
                 var jsons = new
                 {
@@ -370,7 +309,7 @@ namespace MyCore.Controllers.Sell
                 };
                 return Json(jsons);
             }
-            if (SellBills.Status == 1)
+            if (Bills.Status == 1)
             {
                 var jsons = new
                 {
@@ -378,8 +317,8 @@ namespace MyCore.Controllers.Sell
                 };
                 return Json(jsons);
             }
-            var SellBills_MX = conn.SellBill_MX.Where(b => b.Bill_id == ids);
-            conn.Remove(SellBills);
+            var Bills_MX = conn.MoreLoseBill_MX.Where(b => b.Bill_id == ids);
+            conn.Remove(Bills);
             try
             {
                 await conn.SaveChangesAsync();
@@ -401,9 +340,9 @@ namespace MyCore.Controllers.Sell
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditBill(int ids, string SHType, SellBill SellBills, List<SellBill_MX> SellBills_MX)
+        public async Task<IActionResult> EditBill(int ids, string SHType, MoreLoseBill Bills, List<MoreLoseBill_MX> Bills_MX)
         {
-            if (SellBills == null)
+            if (Bills == null)
             {
                 var jsons = new
                 {
@@ -411,9 +350,9 @@ namespace MyCore.Controllers.Sell
                 };
                 return Json(jsons);
             }
-            var EditSellBills = await conn.SellBill.FirstOrDefaultAsync(b => b.id == ids);
-            var EditSellBills_MX = conn.SellBill_MX.Where(b => b.Bill_id == ids);
-            if (EditSellBills == null)
+            var EditBills = await conn.MoreLoseBill.FirstOrDefaultAsync(b => b.id == ids);
+            var EditBills_MX = conn.MoreLoseBill_MX.Where(b => b.Bill_id == ids);
+            if (EditBills == null)
             {
                 var jsons = new
                 {
@@ -421,7 +360,7 @@ namespace MyCore.Controllers.Sell
                 };
                 return Json(jsons);
             }
-            if (EditSellBills.Status == 1)
+            if (EditBills.Status == 1)
             {
                 var jsons = new
                 {
@@ -430,23 +369,20 @@ namespace MyCore.Controllers.Sell
                 return Json(jsons);
             }
             //更新主表
-            EditSellBills.BillDate = SellBills.BillDate;
-            EditSellBills.SellName = SellBills.SellName;
-            EditSellBills.SellNameID = SellBills.SellNameID;
-            EditSellBills.StroeInfo_id = SellBills.StroeInfo_id;
-            EditSellBills.StoreName = SellBills.StoreName;
-            EditSellBills.GiveSum = SellBills.GiveSum;
-            EditSellBills.Sup_id = SellBills.Sup_id;
-            EditSellBills.SupName = SellBills.SupName;
-            EditSellBills.BZ = SellBills.BZ;
+            EditBills.BillDate = Bills.BillDate;
+            EditBills.YSName = Bills.YSName;
+            EditBills.YSNameID = Bills.YSNameID;
+            EditBills.StroeInfo_id = Bills.StroeInfo_id;
+            EditBills.StoreName = Bills.StoreName;
+            EditBills.BZ = Bills.BZ;
             //删除原来明细
-            foreach (var item in EditSellBills_MX)
+            foreach (var item in EditBills_MX)
             {
-                conn.SellBill_MX.Remove(item);
+                conn.MoreLoseBill_MX.Remove(item);
             }
-            EditSellBills.SellBill_MX = SellBills_MX;
+            EditBills.MoreLoseBill_MX = Bills_MX;
             //对明细表进行处理
-            foreach (var item in SellBills_MX)
+            foreach (var item in Bills_MX)
             {
                 if (item.Num == 0)
                 {
@@ -456,9 +392,9 @@ namespace MyCore.Controllers.Sell
                     };
                     return Json(json);
                 }
-                item.StroeInfo_id = SellBills.StroeInfo_id;
-                item.StoreName = SellBills.StoreName;
-                item.Sum = item.Num * item.SellPrice;
+                item.StroeInfo_id = Bills.StroeInfo_id;
+                item.StoreName = Bills.StoreName;
+                item.Sum = item.Num * item.Price;
                 //审核
                 if (SHType == "yes")
                 {
@@ -489,14 +425,14 @@ namespace MyCore.Controllers.Sell
             //添加目前的明细
 
 
-            EditSellBills.Sum = SellBills_MX.Sum(b => b.Sum);
+            EditBills.Sum = Bills_MX.Sum(b => b.Sum);
             string UserID = HttpContext.Session.GetString("UserID");
             DateTime now = DateTime.Now;
             if (SHType == "yes")
             {
-                EditSellBills.Status = 1;
-                EditSellBills.SHName = UserID;
-                EditSellBills.SHDate = now;
+                EditBills.Status = 1;
+                EditBills.SHName = UserID;
+                EditBills.SHDate = now;
             }
 
 
@@ -521,12 +457,12 @@ namespace MyCore.Controllers.Sell
 
         }
 
-
         [HttpPost]
         public async Task<IActionResult> GetFile(string StrSearchType, string StrSearch)
         {
 
-            IQueryable<SellBill> bills = conn.SellBill.Where(b => b.BillType == "SE");
+
+            IQueryable<MoreLoseBill> bills = conn.MoreLoseBill.Where(b => b.BillType == "MR");
 
             if (!string.IsNullOrWhiteSpace(StrSearchType))
             {
@@ -538,11 +474,11 @@ namespace MyCore.Controllers.Sell
                             bills = bills.Where(b => b.BillID.Contains(StrSearch));
                             break;
                         case "1":
-                            bills = bills.Where(b => b.SellName.Contains(StrSearch));
+                            bills = bills.Where(b => b.YSName.Contains(StrSearch));
 
                             break;
                         case "2":
-                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
+                            bills = bills.Where(b => b.CreateName.Contains(StrSearch));
 
                             break;
                         default:
@@ -555,25 +491,23 @@ namespace MyCore.Controllers.Sell
 
             var lists = await bills.ToListAsync();
 
-            byte[] buffer = ExcelHelp.Export<SellBill>(lists, "销售退回单", "销售退回单", SysTool.GetPropertyNameArray<SellBill>()).GetBuffer();
+            byte[] buffer = ExcelHelp.Export<MoreLoseBill>(lists, "报溢单", "报溢单", SysTool.GetPropertyNameArray<MoreLoseBill>()).GetBuffer();
 
 
-            var fileName = "销售退回单" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
+            var fileName = "报溢单" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
 
             return File(buffer, "application/vnd.ms-excel", fileName);
         }
         public async Task<IActionResult> GetBillList(int ids)
         {
-            var bill = await conn.SellBill.FirstOrDefaultAsync(b => b.id == ids);
-            conn.Entry(bill).Collection(p => p.SellBill_MX).Query().Load();
+            var bill = await conn.MoreLoseBill.FirstOrDefaultAsync(b => b.id == ids);
+            conn.Entry(bill).Collection(p => p.MoreLoseBill_MX).Query().Load();
             var data = new
             {
                 bills = bill
             };
             return Json(data);
         }
-
-
 
 
 
