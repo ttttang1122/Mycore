@@ -73,12 +73,13 @@
             rowNum: 30,//一页显示多少条
             rowList: [10,20,30,50,100],//可供用户选择一页显示多少条
             pager: '#pager1',//表格页脚的占位符(一般是div)的id
-            sortname: 'id',//初始化的时候排序的字段
-            sortorder: "desc",//排序方式,可选desc,asc
+            sortname: 'GoodID',//初始化的时候排序的字段
+            sortorder: "asc",//排序方式,可选desc,asc
             mtype: "post",//向后台请求数据的ajax的类型。可选post,get
             viewrecords: true,
             shrinkToFit: false,
-            rownumbers: true,       
+            rownumbers: true,   
+            //postData: { 'sidx': 'GoodID', 'sord': 'asc' },
           });
           $(window).bind('resize', function () {
               $("#list1").setGridWidth($(window).width() - 20);

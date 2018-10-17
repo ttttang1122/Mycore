@@ -10,9 +10,10 @@ using System;
 namespace MyCore.Migrations
 {
     [DbContext(typeof(MyCoreContext))]
-    partial class MyCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20181016084737_createtakestock")]
+    partial class createtakestock
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -863,6 +864,8 @@ namespace MyCore.Migrations
 
                     b.Property<decimal>("TakeNum");
 
+                    b.Property<int?>("TakeStockBillid");
+
                     b.Property<DateTime?>("scDate");
 
                     b.Property<DateTime?>("yxqDate");
@@ -870,6 +873,8 @@ namespace MyCore.Migrations
                     b.HasKey("id");
 
                     b.HasIndex("Bill_id");
+
+                    b.HasIndex("TakeStockBillid");
 
                     b.ToTable("TakeStockBill_MX");
                 });
@@ -960,10 +965,14 @@ namespace MyCore.Migrations
 
             modelBuilder.Entity("MyCore.Models.Store.TakeStockBill_MX", b =>
                 {
-                    b.HasOne("MyCore.Models.Store.TakeStockBill", "TakeStockBill")
-                        .WithMany("TakeStockBill_MX")
+                    b.HasOne("MyCore.Models.Store.MoreLoseBill", "MoreLoseBill")
+                        .WithMany()
                         .HasForeignKey("Bill_id")
                         .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("MyCore.Models.Store.TakeStockBill")
+                        .WithMany("TakeStockBill_MX")
+                        .HasForeignKey("TakeStockBillid");
                 });
 
             modelBuilder.Entity("MyCore.Models.User", b =>

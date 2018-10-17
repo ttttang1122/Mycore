@@ -10,9 +10,10 @@ using System;
 namespace MyCore.Migrations
 {
     [DbContext(typeof(MyCoreContext))]
-    partial class MyCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20181017132028_deltake")]
+    partial class deltake
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -779,101 +780,6 @@ namespace MyCore.Migrations
                     b.ToTable("MoreLoseBill_MX");
                 });
 
-            modelBuilder.Entity("MyCore.Models.Store.TakeStockBill", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("BZ")
-                        .HasMaxLength(200);
-
-                    b.Property<DateTime?>("BillDate");
-
-                    b.Property<string>("BillID")
-                        .HasMaxLength(45);
-
-                    b.Property<DateTime?>("CreateDate");
-
-                    b.Property<string>("CreateName")
-                        .HasMaxLength(45);
-
-                    b.Property<string>("StoreName")
-                        .HasMaxLength(45);
-
-                    b.Property<int>("StroeInfo_id");
-
-                    b.Property<string>("YSName")
-                        .HasMaxLength(45);
-
-                    b.Property<int>("YSNameID");
-
-                    b.HasKey("id");
-
-                    b.ToTable("TakeStockBill");
-                });
-
-            modelBuilder.Entity("MyCore.Models.Store.TakeStockBill_MX", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("BZ")
-                        .HasMaxLength(200);
-
-                    b.Property<int>("Bill_id");
-
-                    b.Property<string>("DW")
-                        .HasMaxLength(45);
-
-                    b.Property<string>("GGType")
-                        .HasMaxLength(45);
-
-                    b.Property<string>("GoodID")
-                        .HasMaxLength(45);
-
-                    b.Property<string>("GoodName")
-                        .HasMaxLength(145);
-
-                    b.Property<int>("Good_id");
-
-                    b.Property<decimal>("HowNum");
-
-                    b.Property<string>("MJPH")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("ModelType")
-                        .HasMaxLength(45);
-
-                    b.Property<decimal>("Price");
-
-                    b.Property<string>("SCCJ")
-                        .HasMaxLength(145);
-
-                    b.Property<string>("SCPH")
-                        .HasMaxLength(100);
-
-                    b.Property<decimal>("StockNum");
-
-                    b.Property<string>("StoreName")
-                        .HasMaxLength(45);
-
-                    b.Property<int?>("StoreRow");
-
-                    b.Property<int?>("StroeInfo_id");
-
-                    b.Property<decimal>("TakeNum");
-
-                    b.Property<DateTime?>("scDate");
-
-                    b.Property<DateTime?>("yxqDate");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("Bill_id");
-
-                    b.ToTable("TakeStockBill_MX");
-                });
-
             modelBuilder.Entity("MyCore.Models.User", b =>
                 {
                     b.Property<int>("id")
@@ -954,14 +860,6 @@ namespace MyCore.Migrations
                 {
                     b.HasOne("MyCore.Models.Store.MoreLoseBill", "MoreLoseBill")
                         .WithMany("MoreLoseBill_MX")
-                        .HasForeignKey("Bill_id")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("MyCore.Models.Store.TakeStockBill_MX", b =>
-                {
-                    b.HasOne("MyCore.Models.Store.TakeStockBill", "TakeStockBill")
-                        .WithMany("TakeStockBill_MX")
                         .HasForeignKey("Bill_id")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
