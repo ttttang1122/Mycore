@@ -62,9 +62,38 @@ namespace MyCore.DAL
         {
             return GetJson<T>(datas.AsQueryable<T>(), sidx, sord, page, rows, fields);
         }
+        public static JsonResult GetJson<T>(this IList<T> datas, string sidx, string sord, int page, int rows,object userData, params string[] fields)
+        {
+            return GetJson<T>(datas.AsQueryable<T>(), sidx, sord, page, rows, userData, fields);
+        }
+        public static JsonResult GetJson<T>(this IQueryable<T> queriable, string sidx, string sord, int page, int rows, params string[] fields)
+        {
+            var recordss = queriable.Count();
+            var data = queriable.GetQueryable<T>(sidx, sord, page, rows);
 
 
-        public static JsonResult GetJson<T>(this IQueryable<T> queriable, string sidx, string sord, int page, int rows,  params string[] fields)
+            if (rows != 0)
+            {
+                var totalpages = (decimal)queriable.Count<T>() / (decimal)rows;
+                totalpages = (totalpages == (int)totalpages) ? totalpages : (int)totalpages + 1;
+
+                var rowsData = GetJsonData<T>(data, fields);
+        
+                var jsdata = new
+                {
+                    page,
+                    records = recordss,
+                    total = (int)totalpages,
+   
+                    rows = rowsData
+                };
+                return new JsonResult(jsdata);
+            }
+            return new JsonResult("");
+
+        }
+
+        public static JsonResult GetJson<T>(this IQueryable<T> queriable, string sidx, string sord, int page, int rows, object userData, params string[] fields)
         {
             var recordss = queriable.Count();
             var data = queriable.GetQueryable<T>(sidx, sord, page, rows);
@@ -83,6 +112,7 @@ namespace MyCore.DAL
                     page,
                     records = recordss,
                     total = (int)totalpages,
+                    userdata = userData,
                     rows = rowsData
                 };
                 return new JsonResult(jsdata);

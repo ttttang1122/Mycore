@@ -819,6 +819,7 @@ namespace MyCore.Controllers.CGMT
         {
             var instorebill = await conn.InStoreBill.FirstOrDefaultAsync(b => b.id == ids);
             conn.Entry(instorebill).Collection(p => p.InStoreBill_MX).Query().Load();
+
             var data = new
             {
                 bills = instorebill

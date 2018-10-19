@@ -66,6 +66,16 @@ $.request = function (name) {
     }
     return "";
 };
+$.fn.formGetModel = function () {
+    var element = $(this);
+    var datas = {};
+    var t = element.serializeArray();
+    $.each(t, function () {
+        datas[this.name] = this.value;
+    });    
+    return datas;
+}
+
 $.fn.formSerialize = function (formdate) {
     var element = $(this);
     if (!!formdate) {

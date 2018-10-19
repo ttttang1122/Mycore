@@ -57,7 +57,9 @@ namespace MyCore.Controllers.Sell
 
                 }
             }
-
+            await bills.ForEachAsync(x => {
+                if (x.BillType == "SR") { x.Sum = x.Sum * -1; }
+            });
             var lists = await bills.ToListAsync();
             return lists.GetJson<SellBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill>());
         }
@@ -66,6 +68,10 @@ namespace MyCore.Controllers.Sell
         public async Task<IActionResult> SellBill_MXList(string sidx, string sord, int page, int rows, int id)
         {
             var bills = await conn.SellBill_MX.Where(b => b.Bill_id == id).ToListAsync();
+            bills.ForEach(x => {
+                conn.Entry(x).Reference(p => p.SellBill).Query().Load();
+                if (x.SellBill.BillType == "SR") { x.Sum = x.Sum * -1; x.Num = x.Num * -1; }
+            });
             return bills.GetJson<SellBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill_MX>());
 
         }
@@ -99,7 +105,9 @@ namespace MyCore.Controllers.Sell
 
                 }
             }
-
+            await bills.ForEachAsync(x => {
+                if (x.BillType == "SR") { x.Sum = x.Sum * -1; }
+            });
             var lists = await bills.ToListAsync();
 
             byte[] buffer = ExcelHelp.Export<SellBill>(lists, "销售统计报表", "销售统计报表", SysTool.GetPropertyNameArray<SellBill>()).GetBuffer();

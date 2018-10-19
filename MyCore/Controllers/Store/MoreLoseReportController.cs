@@ -57,7 +57,9 @@ namespace MyCore.Controllers.Store
 
                 }
             }
-
+            await bills.ForEachAsync(x => {
+                if (x.BillType == "LS") { x.Sum = x.Sum * -1; }
+            });
             var lists = await bills.ToListAsync();
             return lists.GetJson<MoreLoseBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<MoreLoseBill>());
         }
@@ -66,6 +68,10 @@ namespace MyCore.Controllers.Store
         public async Task<IActionResult> MoreLose_MXList(string sidx, string sord, int page, int rows, int id)
         {
             var bills = await conn.MoreLoseBill_MX.Where(b => b.Bill_id == id).ToListAsync();
+            bills.ForEach(x => {
+                conn.Entry(x).Reference(p => p.MoreLoseBill).Query().Load();
+                if (x.MoreLoseBill.BillType == "LS") { x.Sum = x.Sum * -1; x.Num = x.Num * -1; }
+            });
             return bills.GetJson<MoreLoseBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<MoreLoseBill_MX>());
 
         }
@@ -102,7 +108,9 @@ namespace MyCore.Controllers.Store
 
                 }
             }
-
+            await bills.ForEachAsync(x => {
+                if (x.BillType == "LS") { x.Sum = x.Sum * -1; }
+            });
             var lists = await bills.ToListAsync();
 
             byte[] buffer = ExcelHelp.Export<MoreLoseBill>(lists, "报损报溢单", "报损报溢单", SysTool.GetPropertyNameArray<MoreLoseBill>()).GetBuffer();

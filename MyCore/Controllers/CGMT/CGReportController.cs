@@ -59,7 +59,9 @@ namespace MyCore.Controllers.CGMT
 
                 }
             }
-
+            await bills.ForEachAsync(x => {
+                if (x.BillType == "BR") { x.Sum = x.Sum * -1; }
+            });
             var lists = await bills.ToListAsync();
             return lists.GetJson<InStoreBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<InStoreBill>());
         }
@@ -68,6 +70,10 @@ namespace MyCore.Controllers.CGMT
         public async Task<IActionResult> InStore_MXList(string sidx, string sord, int page, int rows, int id)
         {
             var bills = await conn.InStoreBill_MX.Where(b => b.Bill_id == id).ToListAsync();
+            bills.ForEach(x => {
+                conn.Entry(x).Reference(p => p.InStoreBill).Query().Load();
+                if (x.InStoreBill.BillType == "BR") { x.Sum = x.Sum * -1; x.Num = x.Num * -1; }
+            });
             return bills.GetJson<InStoreBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<InStoreBill_MX>());
 
         }
@@ -102,7 +108,9 @@ namespace MyCore.Controllers.CGMT
 
                 }
             }
-
+            await bills.ForEachAsync(x => {
+                if (x.BillType == "BR") { x.Sum = x.Sum * -1; }
+            });
             var lists = await bills.ToListAsync();
 
             byte[] buffer = ExcelHelp.Export<InStoreBill>(lists, "采购报表", "采购报表", SysTool.GetPropertyNameArray<InStoreBill>()).GetBuffer();
