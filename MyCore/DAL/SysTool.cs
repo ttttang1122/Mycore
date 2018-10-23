@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Reflection;
 using System.Data;
+using Newtonsoft.Json;
+using System.IO;
 
 namespace MyCore.DAL
 {
@@ -170,13 +172,35 @@ namespace MyCore.DAL
             string[] array = properties.Select(t => t.Name).ToArray();
             return array;
         }
-        //public static List<T> JSONStringToList<T>(string JsonStr)
-        //{
-        //    JavaScriptSerializer Serializer = new JavaScriptSerializer();
-        //    //设置转化JSON格式时字段长度
-        //    List<T> objs = Serializer.Deserialize<List<T>>(JsonStr);
-        //    return objs;
-        //}
+        public static List<T> JSONStringToList<T>(string json)
+        {
+            JsonSerializer serializer = new JsonSerializer();
+            StringReader sr = new StringReader(json);
+            object o = serializer.Deserialize(new JsonTextReader(sr), typeof(List<T>));
+            List<T> list = o as List<T>;
+            return list;
+        }
+        public static T JsonToModel<T>(string json) where T : class
+        {
+            try
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                StringReader sr = new StringReader(json);
+                object o = serializer.Deserialize(new JsonTextReader(sr), typeof(T));
+
+
+                T t = o as T;
+                return t;
+            }
+            catch (Exception ex)
+            {
+
+
+                return null;
+            }
+
+
+        }
 
         public static int InvoiceType(string FPZL)
         {

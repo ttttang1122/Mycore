@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyCore.Controllers.Store
 {
-    public class TakeStockController : Controller
+    public class TakeStockController : BaseController
     {
         private MyCoreContext conn;
 

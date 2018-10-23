@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyCore.Controllers.Store
 {
-    public class MoreLoseReportController : Controller
+    public class MoreLoseReportController : BaseController
     {
         private MyCoreContext conn;
 

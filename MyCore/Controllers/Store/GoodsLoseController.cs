@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyCore.Controllers.Store
 {
-    public class GoodsLoseController : Controller
+    public class GoodsLoseController : BaseController
     {
         private MyCoreContext conn;
 

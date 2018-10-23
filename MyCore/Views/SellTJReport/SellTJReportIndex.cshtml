@@ -1,8 +1,9 @@
 ﻿
 @{
-    ViewData["Title"] = "CGTJReportIndex";
+    ViewData["Title"] = "SellTJReportIndex";
     Layout = "~/Views/Share/_LayoutBody.cshtml";
 }
+
 
 <script src="~/layuiadmin/layui/layui.js"></script>
 <script src="~/layuiadmin/layui/layui.all.js"></script>
@@ -18,7 +19,7 @@
                     <div class="ui-filter" style="width: 200px;">
                         <div class="ui-filter-text">
                             <strong id="StartTime">2018-09-19</strong>  至 <strong id="EndTime">现在</strong>
-                            <i authorize="yes"  id="btn_Search" style="float:right;padding-right:2px" class="layui-icon ">&#xe625;</i>
+                            <i authorize="yes" id="btn_Search" style="float:right;padding-right:2px" class="layui-icon ">&#xe625;</i>
                         </div>
                         <div id="list-Search" class="ui-filter-list" style="width: 450px;">
                             <form id="form1" class="layui-form">
@@ -27,7 +28,7 @@
                                         <th class="formTitle">开始日期:</th>
                                         <td class="formValue" colspan="3">
                                             <div style="float: left; width: 45%;">
-                                                <input type="text" name="StartDate"  autocomplete="off"class="form-control input-sm layui-input" id="StartDate">
+                                                <input type="text" name="StartDate" autocomplete="off" class="form-control input-sm layui-input" id="StartDate">
                                             </div>
                                             <div style="float: left; width: 10%; text-align: center;">
                                                 至:
@@ -59,16 +60,16 @@
 
                                     </tr>
                                     <tr>
-                                        <th class="formTitle">经手人</th>
+                                        <th class="formTitle">销售员</th>
                                         <td class="formValue" colspan="3">
                                             <input id="YSName" name="YSName" type="text" autocomplete="off" class="form-control input-sm" />
                                         </td>
                                     </tr>
                                 </table>
                             </form>
-                            <div  style="float:right;padding-right:5px">
-                                <button type="button"  class="layui-btn layui-btn-primary layui-btn-sm" data-type="Clear" id="Clear"><i class="layui-icon ">&#xe9aa;</i>重置</button>
-                                <button type="button"  authorize="yes"  class="layui-btn layui-btn-sm" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i>查询</button>
+                            <div style="float:right;padding-right:5px">
+                                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" data-type="Clear" id="Clear"><i class="layui-icon ">&#xe9aa;</i>重置</button>
+                                <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i>查询</button>
                             </div>
                         </div>
                     </div>
@@ -125,7 +126,7 @@
         bodyheight = document.body.scrollHeight;
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
-            url: '/CGTJReport/InStoreList',
+            url: '/SellTJReport/SellList',
             datatype: "json",
             jsonReader: {
                 repeatitems: false,
@@ -135,23 +136,23 @@
                 { label: '单据日期', name: 'BillDate', index: 'BillDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
                 {
                     label: '单据类型', name: 'BillType', index: 'BillType', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
-                        if (cellvalue == "BR") {
-                            return '<span class="layui-badge layui-bg-red">采购退货单</span>';
-                        } else if (cellvalue == "IS") {
-                            return '<span class="layui-badge layui-bg-green">采购入库单</span>';
+                        if (cellvalue == "SR") {
+                            return '<span class="layui-badge layui-bg-red">销售退回单</span>';
+                        } else if (cellvalue == "SE") {
+                            return '<span class="layui-badge layui-bg-green">销售开单</span>';
                         } else {
                             return '<span class="layui-badge layui-bg-orange">未知</span>';
                         }
                     }
                 },
                 { label: '单据号', name: 'BillID', index: 'BillID', width: 180, align: 'center' },
-                { label: '经手人', name: 'YSName', index: 'YSName', width: 80, align: 'center' },
-                { label: '供应商', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
+                { label: '销售员', name: 'SellName', index: 'SellName', width: 80, align: 'center' },
+                { label: '客户', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
                 { label: '仓库', name: 'StoreName', index: 'StoreName', width: 120, align: 'center' },
                 { label: '金额', name: 'Sum', index: 'Sum', width: 120, align: 'center' },
                 { label: '备注', name: 'BZ', index: 'BZ', width: 100, align: 'center' },
                 {
-                    label: '审核状态', name: 'SHStatus', index: 'SHStatus', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
+                    label: '审核状态', name: 'Status', index: 'Status', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
                         if (cellvalue == "0") {
                             return '<span class="layui-badge layui-bg-red">未审核</span>';
                         } else if (cellvalue == "1") {
@@ -192,7 +193,7 @@
 
                 // (6)创建jqGrid对象
                 $("#" + subgrid_table_id).jqGrid({
-                    url: "/CGTJReport/InStore_MXList?&id=" + row_id,  // (7)子表格数据对应的url，注意传入的contact.id参数
+                    url: "/SellTJReport/Sell_MXList?&id=" + row_id,  // (7)子表格数据对应的url，注意传入的contact.id参数
                     datatype: "json",
                     styleUI: 'Bootstrap',
                     colModel: [
@@ -207,7 +208,7 @@
                         { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 75, align: 'center' },
                         { label: '有效期至', name: 'yxqDate', index: 'yxqDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 75, align: 'center' },
                         { label: '数量', name: 'Num', index: 'Num', width: 80, align: 'center' },
-                        { label: '单价', name: 'Price', index: 'Price', width: 75, align: 'center' },
+                        { label: '单价', name: 'SellPrice', index: 'SellPrice', width: 75, align: 'center' },
                         { label: '金额', name: 'Sum', index: 'Sum', width: 80, align: 'center' },
                         { label: '备注', name: 'BZ', index: 'BZ', width: 80, align: 'center' },
                     ],
@@ -272,11 +273,11 @@
         }).trigger('resize');
 
     });
-   
+
 
     $(function () {
         $.hands = {
-            Search: function () {     
+            Search: function () {
                 datas = $('#form1').formGetModel();
                 $.loading(true, "正在查询数据");
                 window.setTimeout(function () {
@@ -298,12 +299,12 @@
                 else {
                     $("#EndTime").html('现在');
                 }
-              
+
                 $('#list-Search').hide();
             },
             Excel: function () {
                 //$.loading(true, "正在提交数据");
-                //window.setTimeout(function () {                    
+                //window.setTimeout(function () {
                 //    var funFrom = $("#form1");
                 //    funFrom.attr("method", "post")
                 //    funFrom.attr("action", "/CGTJReport/GetFile/")
@@ -322,7 +323,7 @@
                 window.setTimeout(function () {
                     var funFrom = document.createElement("form");
                     document.body.appendChild(funFrom);
-                    funFrom.action = '/CGTJReport/GetFile/';
+                    funFrom.action = '/SellTJReport/GetFile/';
                     funFrom.method = 'post';
                     var total = $("#list1").jqGrid('getGridParam', 'records');
                     if (parseInt(total) > 0) {
@@ -351,7 +352,7 @@
 
             },
             Clear: function () {
-                $('#form1')[0].reset();  
+                $('#form1')[0].reset();
                 var strdate = new Date().Format("yyyy-MM-dd");
                 $("#StartDate").val(strdate);
 
@@ -380,6 +381,8 @@
         z-index: 99;
     }
 </style>
+
+
 
 
 

@@ -1,0 +1,232 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>毛利分析报表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="~/layuiadmin/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="~/css/admin.css" media="all">
+    <link href="~/css/app.css" rel="stylesheet" />
+    <script src="~/js/jquery-3.2.1.min.js"></script>
+    <script src="~/layuiadmin/lib/FrameWork.js"></script>
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <script src="~/layuiadmin/layui/layui.all.js"></script>
+    <script src="~/layuiadmin/lib/Chart.js"></script>
+</head>
+<body>
+    <style>
+        #LAY-component-grid-mobile .layui-card-body {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            height: 100%;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        .layui-btn-group {
+            font-size: 12px;
+        }
+
+        .layui-form-label {
+            float: left;
+            display: block;
+            padding: 9px 10px;
+            width: 60px;
+            font-weight: 400;
+            line-height: 20px;
+            text-align: right;
+            font-size: 12px;
+        }
+
+        .layui-form-select dl dd, .layui-form-select dl dt {
+            line-height: 24px;
+        }
+
+        .layui-form-item .layui-input-inline {
+            font-size: 12px;
+        }
+
+        .layui-input, .layui-select, .layui-textarea {
+            height: 25px;
+        }
+
+        .layui-unselect dl {
+            max-height: 200px;
+        }
+
+        .layui-form-select dl {
+            top: 26px;
+        }
+    </style>
+
+    <div class="layui-fluid" id="LAY-component-grid-mobile">
+        <div class="layui-row layui-col-space10">
+            <div class="layui-col-xs12">
+                <div class="layui-card">
+                    <div class="layui-card-header">
+                        <div class="layui-btn-group">
+                            <div class="layui-form-item" style="margin-bottom:5px">
+                                <div class="layui-input-inline" style="width:55px">
+                                    <span>选择年份:</span>
+                                </div>
+                                <div class="layui-input-inline" style="width:80px">
+                                    <input type="text" id="ChangeTime" name="ChangeTime" readonly="true" autocomplete="off" class="layui-input" style="width:80px;margin-top:8px;font-weight:bolder">
+                                </div>
+                                <div class="layui-input-inline">
+                                    <button type="button" onclick="GetFX()" authorize="yes" class="layui-btn layui-btn-xs " data-type="Search" id="Search">查询</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-card-body">
+                        <canvas id="zxChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+    <script>$('.layui-card-header').authorizeButton()</script>
+    <script src="~/layuiadmin/layui/layui.js"></script>
+    <script>
+        layui.config({
+            base: '../../../layuiadmin/' //静态资源所在路径
+        }).extend({
+            index: 'lib/index' //主入口模块
+        }).use(['index']);
+
+    </script>
+    <script>
+        var bodyheight = document.body.scrollHeight - 110;
+        $("#zxChart").css("height", bodyheight + "px");
+        function getSum(total, num) {
+            return total + num;
+        };
+
+        $(function () {
+            var strdate = new Date().Format("yyyy");
+            layui.use(['table', 'form', 'layedit', 'laydate'], function () {
+                var form = layui.form
+                    , layer = layui.layer
+                    , layedit = layui.layedit
+                    , laydate = layui.laydate
+                    , table = layui.table;
+                laydate.render({
+                    elem: '#ChangeTime',//制定元素
+                    type: 'year',
+                    show: false,//默认显示
+                    position: 'fixed',
+                    value: strdate,
+                    isInitValue: true, //是否允许填充初始值，默认为 true
+                });
+                $("#ChangeTime").html(strdate);
+                form.render();
+            });
+
+
+
+            FXReport(strdate);
+
+
+        });
+
+        function FXReport(stryears) {
+            var datas = [];
+            var lbName = stryears + '年';
+            var textName = stryears + '年毛利报表';
+            $.ajax({
+                url: "/MakeMoneyTJ/GetDatas/",
+                data: { years: stryears },
+                type: "post",
+                dataType: "json",
+                success: function (rts) {
+                    if (rts.errorMsg) {
+                        top.layer.msg(rts.errorMsg, { icon: 2 });
+                    }
+                    else {
+                        var Moneys = rts.datas;
+                        $.each(Moneys, function (i) {
+                            datas.push(Moneys[i]);
+                        });
+                        var zxctx = $("#zxChart").get(0).getContext("2d");
+                        var zxChar = new Chart(zxctx, {
+                            type: 'line',
+                            data: {
+                                labels: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+                                datasets: [
+                                    {
+                                        label: lbName,
+                                        backgroundColor: "rgba(255, 99, 132, 0.2)",
+                                        borderColor: "rgba(255, 99, 132, 1)",
+                                        data: datas
+                                    }
+                                ]
+                            },
+                            options: {
+                                title: {
+                                    display: true,
+                                    text: textName
+                                }
+                            },
+                            plugins: [{
+                                afterDatasetsDraw: function (chart) {
+                                    var ctx = chart.ctx;
+                                    chart.data.datasets.forEach(function (dataset, i) {
+                                        var meta = chart.getDatasetMeta(i);
+                                        if (!meta.hidden) {
+                                            meta.data.forEach(function (element, index) {
+                                                // Draw the text in black, with the specified font
+                                                ctx.fillStyle = 'rgb(0, 0, 0)';
+
+                                                var fontSize = 16;
+                                                var fontStyle = 'normal';
+                                                var fontFamily = 'Helvetica Neue';
+                                                ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+                                                // Just naively convert to string for now
+                                                var dataString = dataset.data[index].toString();
+
+                                                // Make sure alignment settings are correct
+                                                ctx.textAlign = 'center';
+                                                ctx.textBaseline = 'middle';
+
+                                                var padding = 5;
+                                                var position = element.tooltipPosition();
+                                                ctx.fillText(dataString, position.x, position.y - (fontSize / 2) - padding);
+                                            });
+                                        }
+                                    });
+                                }
+                            }]
+
+                        });
+                    }
+
+                }
+            });
+        };
+
+        function GetFX() {
+            var stryear = $("#ChangeTime").val();
+            FXReport(stryear);
+        };
+
+
+    </script>
+</body>
+</html>
+
+

@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MyCore.Controllers.Sell
 {
-    public class SellReturnController : Controller
+    public class SellReturnController : BaseController
     {
         private MyCoreContext conn;
 

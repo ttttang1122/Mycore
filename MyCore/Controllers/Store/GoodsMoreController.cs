@@ -13,7 +13,7 @@ using System.Text;
 using Microsoft.EntityFrameworkCore;
 namespace MyCore.Controllers.Store
 {
-    public class GoodsMoreController : Controller
+    public class GoodsMoreController : BaseController
     {
         private MyCoreContext conn;
 
