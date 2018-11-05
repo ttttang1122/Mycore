@@ -251,6 +251,7 @@
                     $(".ui-jqgrid-sdiv").show();
                     //页合计
                     var Sums = jQuery(this).getCol('Sum', false, 'sum');
+                    Sums = Math.round(Sums * 100) / 100;
                     //总计
                     var AllSums = $("#list1").jqGrid('getGridParam', 'userData').sums;
                     $(this).footerData("set", { "StoreName": "<font color='red'>" + "页合计:" + "<font>", "Sum": "<font color='red'>" + Sums + "<font>" });

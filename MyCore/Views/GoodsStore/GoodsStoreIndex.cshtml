@@ -4,34 +4,116 @@
     Layout = "~/Views/Share/_LayoutBody.cshtml";
 }
 
-
 <div class="list-wall">
     <div class="list-top">
         <div class="layui-btn-group">
-            <form class="layui-form">
-                <div class="layui-form-item" style="margin-bottom:5px">
-                    <div class="layui-input-inline" style="width:100px">
-                        <select id="StrSearchType" name="query" lay-verify="required">
-                            <option value="0">仓库名称</option>
-                            <option value="1">商品编号</option>
-                            <option value="2">商品名称</option>
-                        </select>
-                    </div>
-                    <div class="layui-input-inline">
-                        <input type="text" id="StrSearch" name="title" required lay-verify="required" autocomplete="off" class="layui-input" style="width:200px;">
-                    </div>
-                    <div class="layui-input-inline" style="padding-left:10px">
-                        <button type="button" authorize="yes" class="layui-btn layui-btn-xs layui-btn-normal" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i> 查询</button>
-                    </div>
+            <div class="layui-form-item" style="margin-bottom:5px">
+                <div class="layui-input-inline" style="width:75px">
+                    <label style="padding-left:20px;padding-top:5px">查询条件:</label>
                 </div>
-            </form>
+                <div class="layui-input-inline" style="width:200px;z-index:100">
+                    <div class="ui-filter" style="width: 200px;">
+                        <div class="ui-filter-text">
+                            <strong id="StartTime">2018-01-01</strong>  至 <strong id="EndTime">现在</strong>
+                            <i authorize="yes" id="btn_Search" style="float:right;padding-right:2px" class="layui-icon ">&#xe625;</i>
+                        </div>
+                        <div id="list-Search" class="ui-filter-list" style="width: 450px;">
+                            <form id="form1" class="layui-form">
+                                <table class="form">
+                                    <tr>
+                                        <th class="formTitle">有效期从:</th>
+                                        <td class="formValue" colspan="3">
+                                            <div style="float: left; width: 40%;">
+                                                <input type="text" name="StartDate" autocomplete="off" class="form-control input-sm layui-input" id="StartDate">
+                                            </div>
+                                            <div style="float: left; width: 20%; text-align: center;">
+                                                至:
+                                            </div>
+                                            <div style="float: left; width: 40%;">
+                                                <input id="EndDate" name="EndDate" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="formTitle">商品名称:</th>
+                                        <td class="formValue" colspan="3">
+                                            <input id="GoodName" name="GoodName" type="text" autocomplete="off" class="form-control input-sm" />
+                                        </td>
+
+                                    </tr>
+                                    <tr>
+                                        <th class="formTitle">商品编号:</th>
+                                        <td class="formValue" colspan="3">
+                                            <div style="float: left; width: 40%;">
+                                                <input id="GoodID" name="GoodID" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                            <div style="float: left; width: 20%; text-align: center;">
+                                                仓库名称:
+                                            </div>
+                                            <div style="float: left; width: 40%;">
+                                                <input id="StoreName" name="StoreName" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="formTitle">单位:</th>
+                                        <td class="formValue" colspan="3">
+                                            <div style="float: left; width: 40%;">
+                                                <input id="DW" name="DW" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                            <div style="float: left; width: 20%; text-align: center;">
+                                                规格:
+                                            </div>
+                                            <div style="float: left; width: 40%;">
+                                                <input id="GGType" name="GGType" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th class="formTitle">型号:</th>
+                                        <td class="formValue" colspan="3">
+                                            <div style="float: left; width: 40%;">
+                                                <input id="ModelType" name="ModelType" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                            <div style="float: left; width: 20%; text-align: center;">
+                                                生产厂家:
+                                            </div>
+                                            <div style="float: left; width: 40%;">
+                                                <input id="SCCJ" name="SCCJ" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <th class="formTitle">生产批号:</th>
+                                        <td class="formValue" colspan="3">
+                                            <div style="float: left; width: 40%;">
+                                                <input id="SCPH" name="SCPH" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                            <div style="float: left; width: 20%; text-align: center;">
+                                                灭菌批号:
+                                            </div>
+                                            <div style="float: left; width: 40%;">
+                                                <input id="MJPH" name="MJPH" type="text" autocomplete="off" class="form-control input-sm" />
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </form>
+                            <div style="float:right;padding-right:5px">
+                                <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" data-type="Clear" id="Clear"><i class="layui-icon ">&#xe9aa;</i>重置</button>
+                                <button type="button" authorize="yes" class="layui-btn layui-btn-sm" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i>查询</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
         </div>
-        <div class="layui-btn-group" style="float:right">     
+        <div class="layui-btn-group" style="float:right">
             <button type="button" authorize="yes" class="layui-btn layui-btn-xs" data-type="Excel" id="Excel"><i class="layui-icon ">&#xe601;</i> 导出</button>
         </div>
-
-       
-
     </div>
     <div class="gridPanel">
         <table id="list1" class="table table-condensed"></table>
@@ -40,9 +122,37 @@
 </div>
 <script>$('.list-top').authorizeButton()</script>
 <script>
+    var datas = "";
     var CX_StrSearch = "";
     var bodyheight = 0;
-      $(function () {
+    $(function () {
+        layui.use(['table', 'form', 'layedit', 'laydate'], function () {
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , laydate = layui.laydate
+                , table = layui.table;
+            var strdate = new Date().Format("yyyy-MM-dd");
+            laydate.render({
+                elem: '#StartDate',//制定元素
+                type: 'date',
+                show: false,//默认显示
+                position: 'fixed',
+                value: strdate,
+                isInitValue: true, //是否允许填充初始值，默认为 true
+            });
+            laydate.render({
+                elem: '#EndDate',//制定元素
+                type: 'date',
+                show: false,//默认显示
+                position: 'fixed',
+                isInitValue: true, //是否允许填充初始值，默认为 true
+            });
+            $("#StartTime").html(strdate);
+            datas = $('#form1').formGetModel();
+            form.render();
+        });
+
         bodyheight = document.body.scrollHeight;
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
@@ -54,7 +164,7 @@
             colModel: [
                 { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true},
                 { label: '仓库名称', name: 'StoreName', index: 'StoreName', width: 100, align: 'center'},
-                { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 80, align: 'center' },
+                { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 100, align: 'center' },
                 { label: '商品名称', name: 'GoodName', index: 'GoodName', width: 180, align: 'center'},
                 { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
                 { label: '规格', name: 'GGType', index: 'GGType', width: 80, align: 'center' },
@@ -79,7 +189,7 @@
             viewrecords: true,
             shrinkToFit: false,
             rownumbers: true,   
-            //postData: { 'sidx': 'GoodID', 'sord': 'asc' },
+            postData: { 'Search': datas },
           });
           $(window).bind('resize', function () {
               $("#list1").setGridWidth($(window).width() - 20);
@@ -87,30 +197,34 @@
           }).trigger('resize');
 
     });
-    $(function () {
-        layui.use('form', function () {
-            var form = layui.form;
-            $('#StrSearchType').val(0);
-            form.render();
-        });
-    });
+ 
 
     $(function (){
         $.hands = {
-            
             Search: function () {
+                datas = $('#form1').formGetModel();
                 $.loading(true, "正在查询数据");
-                CX_StrSearchType = $('#StrSearchType').val();
-                CX_StrSearch = $('#StrSearch').val();
                 window.setTimeout(function () {
                     $("#list1").jqGrid('setGridParam', {
-                        datatype: 'json',
-                        postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch },
+                        postData: { 'Search': datas },
                         //page: 1
                     }).trigger("reloadGrid");
 
                     $.loading(false);
                 }, 500);
+                var startdate = $("#StartDate").val();
+                $("#StartTime").html(startdate);
+                var enddate = $("#EndDate").val();
+
+                if (enddate != undefined && enddate != "" && enddate != null) {
+
+                    $("#EndTime").html(enddate);
+                }
+                else {
+                    $("#EndTime").html('现在');
+                }
+
+                $('#list-Search').hide();
             },
             Excel: function () {
                 $.loading(true, "正在提交数据");
@@ -119,20 +233,12 @@
                     document.body.appendChild(funFrom);
                     funFrom.action = '/GoodsStore/GetFile/';
                     funFrom.method = 'post';
-
                     var total = $("#list1").jqGrid('getGridParam', 'records');
                     if (parseInt(total) > 0) {
-                        var newStrSearchType = document.createElement("input");
-                        newStrSearchType.setAttribute("name", "StrSearchType");
-                        newStrSearchType.setAttribute("type", "hidden");
-                        newStrSearchType.setAttribute("value", CX_StrSearchType);
-
                         var newStrSearch = document.createElement("input");
-                        newStrSearch.setAttribute("name", "StrSearch");
+                        newStrSearch.setAttribute("name", "JsonSearch");
                         newStrSearch.setAttribute("type", "hidden");
-                        newStrSearch.setAttribute("value", CX_StrSearch);
-
-                        funFrom.appendChild(newStrSearchType);
+                        newStrSearch.setAttribute("value", JSON.stringify(datas));
                         funFrom.appendChild(newStrSearch);
                         funFrom.submit();
                     } else {
@@ -141,10 +247,29 @@
 
                 }, 500);
                 $.loading(false);
-            },        
+            },
+            BtnSearch: function () {
+                var display = $('#list-Search').css('display');
+                if (display == 'none') {
+                    $("#list-Search").show()
+
+                } else {
+                    $('#list-Search').hide();
+
+                }
+
+            },
+            Clear: function () {
+                $('#form1')[0].reset();
+                var strdate = new Date().Format("yyyy-MM-dd");
+                $("#StartDate").val(strdate);
+
+            },
             init:function() {               
                 $('#Search').on('click', $.hands.Search);
-                $('#Excel').on('click', $.hands.Excel);            
+                $('#Excel').on('click', $.hands.Excel);      
+                $('#Clear').on('click', $.hands.Clear);
+                $('#btn_Search').on('click', $.hands.BtnSearch);
             }
         }
         $(function () {
@@ -155,7 +280,15 @@
 </script>
 
 
+<style>
+    #form1 > td, th {
+        padding: 5px 0px 5px 0px;
+    }
 
+    .ui-jqgrid {
+        z-index: 99;
+    }
+</style>
 
 
 

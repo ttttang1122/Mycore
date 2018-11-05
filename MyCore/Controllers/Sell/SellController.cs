@@ -8,63 +8,63 @@ using MyCore.Models.BaseData;
 using MyCore.Models.SellData;
 using MyCore.Models.Store;
 using MyCore.Models;
+using MyCore.Models.Search;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace MyCore.Controllers.Sell
 {
     public class SellController : BaseController
     {
         private MyCoreContext conn;
-
         public SellController(MyCoreContext _conn)
         {
             conn = _conn;
         }
-
         public IActionResult SellIndex()
         {
             return View();
         }
-
-
         [HttpPost]
-        public async Task<IActionResult> SellList(string sidx, string sord, int page, int rows, string StrSearchType, string StrSearch)
+        public async Task<IActionResult> SellList(string sidx, string sord, int page, int rows, Search_SellBill Search)
         {
 
-
-            IQueryable<SellBill> bills = conn.SellBill.Where(b => b.BillType == "SE");
-
-            if (!string.IsNullOrWhiteSpace(StrSearchType))
+            Expression<Func<SellBill, bool>> predicate = ExpressionBuilder.True<SellBill>();
+            predicate = predicate.And(b => b.BillType == "SE");
+            if (Search.StartDate != null)
             {
-                if (!string.IsNullOrWhiteSpace(StrSearch))
-                {
-                    switch (StrSearchType)
-                    {
-                        case "0":
-                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
-                            break;
-                        case "1":
-                            bills = bills.Where(b => b.SellName.Contains(StrSearch));
-
-                            break;
-                        case "2":
-                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
-
-                            break;
-                        default:
-
-                            break;
-                    }
-
-                }
+                predicate = predicate.And(b => b.BillDate >= Search.StartDate);
+            }
+            if (Search.EndDate != null)
+            {
+                predicate = predicate.And(b => b.BillDate <= Search.EndDate);
+            }
+            if (!string.IsNullOrWhiteSpace(Search.BillID))
+            {
+                predicate = predicate.And(b => b.BillID.Contains(Search.BillID));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.SupName))
+            {
+                predicate = predicate.And(b => b.SupName.Contains(Search.SupName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.JSName))
+            {
+                predicate = predicate.And(b => b.SellName.Contains(Search.JSName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.StoreName))
+            {
+                predicate = predicate.And(b => b.StoreName.Contains(Search.StoreName));
             }
 
+
+            IQueryable<SellBill> bills = conn.SellBill.Where(predicate);
+
+         
             var lists = await bills.ToListAsync();
             return lists.GetJson<SellBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill>());
         }
-
         [HttpPost]
         public async Task<IActionResult> SellBill_MXList(string sidx, string sord, int page, int rows, int id)
         {
@@ -72,7 +72,6 @@ namespace MyCore.Controllers.Sell
             return bills.GetJson <SellBill_MX>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<SellBill_MX>());
 
         }
-
         [HttpGet]
         public async Task<IActionResult> GetUser()
         {
@@ -94,17 +93,14 @@ namespace MyCore.Controllers.Sell
             var data = stores.Select(p => new { p.id, p.StoreName });
             return Content(data.ToJson());
         }
-
         public IActionResult AddEditSellIndex()
         {
             return View();
         }
-
         public IActionResult AddRowIndex()
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> GoodsStoreList(string sidx, string sord, int page, int rows, int Store_id, string StrSearchType, string StrSearch,string Check)
         {
@@ -152,7 +148,6 @@ namespace MyCore.Controllers.Sell
 
             return sells.GetJson<StoreAll>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<StoreAll>());
         }
-
         [HttpPost]
         public async Task<IActionResult> SaveBill(string SHType, SellBill SellBills, List<SellBill_MX> SellBills_MX)
         {
@@ -366,7 +361,6 @@ namespace MyCore.Controllers.Sell
             }
 
         }
-
         [HttpPost]
         public async Task<IActionResult> EditBill(int ids, string SHType, SellBill SellBills, List<SellBill_MX> SellBills_MX)
         {
@@ -494,38 +488,42 @@ namespace MyCore.Controllers.Sell
             }
 
         }
-
-
         [HttpPost]
-        public async Task<IActionResult> GetFile(string StrSearchType, string StrSearch)
+        public async Task<IActionResult> GetFile(string JsonSearch)
         {
+            //json字符串转模型
+            var Search = SysTool.JsonToModel<Search_SellBill>(JsonSearch);
 
-            IQueryable<SellBill> bills = conn.SellBill.Where(b => b.BillType == "SE");
 
-            if (!string.IsNullOrWhiteSpace(StrSearchType))
+            Expression<Func<SellBill, bool>> predicate = ExpressionBuilder.True<SellBill>();
+            predicate = predicate.And(b => b.BillType == "SE");
+            if (Search.StartDate != null)
             {
-                if (!string.IsNullOrWhiteSpace(StrSearch))
-                {
-                    switch (StrSearchType)
-                    {
-                        case "0":
-                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
-                            break;
-                        case "1":
-                            bills = bills.Where(b => b.SellName.Contains(StrSearch));
-
-                            break;
-                        case "2":
-                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
-
-                            break;
-                        default:
-
-                            break;
-                    }
-
-                }
+                predicate = predicate.And(b => b.BillDate >= Search.StartDate);
             }
+            if (Search.EndDate != null)
+            {
+                predicate = predicate.And(b => b.BillDate <= Search.EndDate);
+            }
+            if (!string.IsNullOrWhiteSpace(Search.BillID))
+            {
+                predicate = predicate.And(b => b.BillID.Contains(Search.BillID));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.SupName))
+            {
+                predicate = predicate.And(b => b.SupName.Contains(Search.SupName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.JSName))
+            {
+                predicate = predicate.And(b => b.SellName.Contains(Search.JSName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.StoreName))
+            {
+                predicate = predicate.And(b => b.StoreName.Contains(Search.StoreName));
+            }
+
+
+            IQueryable<SellBill> bills = conn.SellBill.Where(predicate);
 
             var lists = await bills.ToListAsync();
 

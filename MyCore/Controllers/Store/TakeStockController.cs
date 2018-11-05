@@ -7,10 +7,11 @@ using MyCore.DAL;
 using MyCore.Models.BaseData;
 using MyCore.Models.SellData;
 using MyCore.Models.Store;
-using MyCore.Models;
+using MyCore.Models.Search;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace MyCore.Controllers.Store
 {
@@ -27,36 +28,33 @@ namespace MyCore.Controllers.Store
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> TakeStockList(string sidx, string sord, int page, int rows, string StrSearchType, string StrSearch)
+        public async Task<IActionResult> TakeStockList(string sidx, string sord, int page, int rows, BillSearch Search)
         {
 
-
-            IQueryable<TakeStockBill> bills = conn.TakeStockBill;
-
-            if (!string.IsNullOrWhiteSpace(StrSearchType))
+            Expression<Func<TakeStockBill, bool>> predicate = ExpressionBuilder.True<TakeStockBill>();
+            if (Search.StartDate != null)
             {
-                if (!string.IsNullOrWhiteSpace(StrSearch))
-                {
-                    switch (StrSearchType)
-                    {
-                        case "0":
-                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
-                            break;
-                        case "1":
-                            bills = bills.Where(b => b.YSName.Contains(StrSearch));
-
-                            break;
-                        case "2":
-                            bills = bills.Where(b => b.CreateName.Contains(StrSearch));
-
-                            break;
-                        default:
-
-                            break;
-                    }
-
-                }
+                predicate = predicate.And(b => b.BillDate >= Search.StartDate);
             }
+            if (Search.EndDate != null)
+            {
+                predicate = predicate.And(b => b.BillDate <= Search.EndDate);
+            }
+            if (!string.IsNullOrWhiteSpace(Search.BillID))
+            {
+                predicate = predicate.And(b => b.BillID.Contains(Search.BillID));
+            }
+
+            if (!string.IsNullOrWhiteSpace(Search.YSName))
+            {
+                predicate = predicate.And(b => b.YSName.Contains(Search.YSName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.StoreName))
+            {
+                predicate = predicate.And(b => b.StoreName.Contains(Search.StoreName));
+            }
+
+            IQueryable<TakeStockBill> bills = conn.TakeStockBill.Where(predicate);
 
             var lists = await bills.ToListAsync();
             return lists.GetJson<TakeStockBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<TakeStockBill>());
@@ -361,35 +359,35 @@ namespace MyCore.Controllers.Store
         }
 
         [HttpPost]
-        public async Task<IActionResult> GetFile(string StrSearchType, string StrSearch)
+        public async Task<IActionResult> GetFile(string JsonSearch)
         {
+            //json字符串转模型
+            var Search = SysTool.JsonToModel<BillSearch>(JsonSearch);
 
-            IQueryable<TakeStockBill> bills = conn.TakeStockBill;
-
-            if (!string.IsNullOrWhiteSpace(StrSearchType))
+            Expression<Func<TakeStockBill, bool>> predicate = ExpressionBuilder.True<TakeStockBill>();
+            if (Search.StartDate != null)
             {
-                if (!string.IsNullOrWhiteSpace(StrSearch))
-                {
-                    switch (StrSearchType)
-                    {
-                        case "0":
-                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
-                            break;
-                        case "1":
-                            bills = bills.Where(b => b.YSName.Contains(StrSearch));
-
-                            break;
-                        case "2":
-                            bills = bills.Where(b => b.CreateName.Contains(StrSearch));
-
-                            break;
-                        default:
-
-                            break;
-                    }
-
-                }
+                predicate = predicate.And(b => b.BillDate >= Search.StartDate);
             }
+            if (Search.EndDate != null)
+            {
+                predicate = predicate.And(b => b.BillDate <= Search.EndDate);
+            }
+            if (!string.IsNullOrWhiteSpace(Search.BillID))
+            {
+                predicate = predicate.And(b => b.BillID.Contains(Search.BillID));
+            }
+
+            if (!string.IsNullOrWhiteSpace(Search.YSName))
+            {
+                predicate = predicate.And(b => b.YSName.Contains(Search.YSName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.StoreName))
+            {
+                predicate = predicate.And(b => b.StoreName.Contains(Search.StoreName));
+            }
+
+            IQueryable<TakeStockBill> bills = conn.TakeStockBill.Where(predicate);
 
             var lists = await bills.ToListAsync();
 

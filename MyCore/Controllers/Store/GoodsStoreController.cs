@@ -140,16 +140,10 @@ namespace MyCore.Controllers.Store
             {
                 predicate = predicate.And(b => b.MJPH.Contains(Search.MJPH));
             }
-
             IQueryable<GoodsStore> bills = conn.GoodsStore.Where(predicate);
-
             var lists = await bills.ToListAsync();
-
             byte[] buffer = ExcelHelp.Export<GoodsStore>(lists, "库存信息", "库存信息", SysTool.GetPropertyNameArray<GoodsStore>()).GetBuffer();
-
-
             var fileName = "库存信息" + DateTime.Now.ToString("yyyy-MM-dd") + ".xls";
-
             return File(buffer, "application/vnd.ms-excel", fileName);
 
         }

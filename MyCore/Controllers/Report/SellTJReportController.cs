@@ -57,9 +57,11 @@ namespace MyCore.Controllers.Report
             });
             var lists = await bills.ToListAsync();
             var sums = lists.Sum(b => b.Sum);
+            var gives = lists.Sum(b => b.GiveSum);
             var userData = new
             {
                 Sums = sums,
+                givesums= gives,
             };
             return lists.GetJson<SellBill>(sidx, sord, page, rows, userData, SysTool.GetPropertyNameArray<SellBill>());
         }

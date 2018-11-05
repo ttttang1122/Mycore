@@ -44,7 +44,7 @@
     <div class="layui-row layui-col-space10">
         <div class="layui-col-xs12">
             <div class="layui-card">
-                <div class="layui-card-body" style=" height:610px; margin-bottom:20px;box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);">
+                <div class="layui-card-body" style=" height:500px; margin-bottom:20px;box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);">
                     <form class="layui-form">
                         <div class="layui-form-item" style="margin-bottom:5px">
                             <label class="layui-form-label">单据日期</label>
@@ -89,6 +89,9 @@
     var lastcell; //最后修改列号先定义一个全局变量
     //初始化界面  
     $(function () {
+        var bodyheight = document.body.scrollHeight;
+        $(".layui-card-body").css("height", bodyheight - 55);
+
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
             datatype: "local",
@@ -118,7 +121,7 @@
             ],
             width: "100%",
             autowidth: true,
-            height: 485,
+            height: bodyheight-180,
             sortname: 'ID',//初始化的时候排序的字段
             sortorder: "desc",//排序方式,可选desc,asc
             //mtype: "post",//向后台请求数据的ajax的类型。可选post,get
@@ -133,8 +136,8 @@
             }
 
           });
-          //填充15行空行
-          for (var i = 1; i <= 15; i++) {
+          //填充100行空行
+          for (var i = 1; i <= 100; i++) {
               var item = {
                   "ids": i,
                   "Good_id": '',
@@ -381,7 +384,8 @@
                 _price = 0;
             }
             var _num = Number(rowData.Num);
-            var _sum = _price * _num;
+            //var _sum = (Math.round(_price * 100) * _num) / 100;
+            var _sum = $.MulNum(_price, _num);
             $("#list1").jqGrid('setCell', id, 'Sum', _sum);
 
 
@@ -393,7 +397,8 @@
             if (isNaN(_num)) {
                 _num = 0;
             }
-            var _sum = _price * _num;
+            //var _sum = (Math.round(_price * 100) * _num) / 100;
+            var _sum = $.MulNum(_price, _num);
             $("#list1").jqGrid('setCell', id, 'Sum', _sum);
 
         }

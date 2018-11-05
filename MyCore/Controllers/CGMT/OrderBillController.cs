@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using MyCore.DAL;
 using MyCore.Models.BaseData;
 using MyCore.Models.CGData;
-using MyCore.Models;
+using MyCore.Models.Search;
 using Microsoft.AspNetCore.Http;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace MyCore.Controllers.CGGL
 {
@@ -26,37 +27,32 @@ namespace MyCore.Controllers.CGGL
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> OrderBillList(string sidx, string sord, int page, int rows, string StrSearchType, string StrSearch)
+        public async Task<IActionResult> OrderBillList(string sidx, string sord, int page, int rows,Search_CGBill Search )
         {
 
-
-            IQueryable<OrderBill> bills = conn.OrderBill;
-
-            if (!string.IsNullOrWhiteSpace(StrSearchType))
+            Expression<Func<OrderBill, bool>> predicate = ExpressionBuilder.True<OrderBill>();
+            if (Search.StartDate != null)
             {
-                if (!string.IsNullOrWhiteSpace(StrSearch))
-                {
-                    switch (StrSearchType)
-                    {
-                        case "0":
-                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
-                            break;
-                        case "1":
-                            bills = bills.Where(b => b.CGName.Contains(StrSearch));
-
-                            break;
-                        case "2":
-                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
-
-                            break;
-                        default:
-
-                            break;
-                    }
-
-                }
+                predicate = predicate.And(b => b.BillDate >= Search.StartDate);
+            }
+            if (Search.EndDate != null)
+            {
+                predicate = predicate.And(b => b.BillDate <= Search.EndDate);
+            }
+            if (!string.IsNullOrWhiteSpace(Search.BillID))
+            {
+                predicate = predicate.And(b => b.BillID.Contains(Search.BillID));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.SupName))
+            {
+                predicate = predicate.And(b => b.SupName.Contains(Search.SupName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.JSName))
+            {
+                predicate = predicate.And(b => b.CGName.Contains(Search.JSName));
             }
 
+            IQueryable<OrderBill> bills = conn.OrderBill.Where(predicate);           
             var lists = await bills.ToListAsync();
             return lists.GetJson<OrderBill>(sidx, sord, page, rows, SysTool.GetPropertyNameArray<OrderBill>());
         }
@@ -390,36 +386,33 @@ namespace MyCore.Controllers.CGGL
 
         }
         [HttpPost]
-        public async Task<IActionResult> GetFile(string StrSearchType, string StrSearch)
+        public async Task<IActionResult> GetFile(string JsonSearch)
         {
-
-            IQueryable<OrderBill> bills = conn.OrderBill;
-
-           
-            if (!string.IsNullOrWhiteSpace(StrSearchType))
+            //json字符串转模型
+            var Search = SysTool.JsonToModel<Search_CGBill>(JsonSearch);
+            Expression<Func<OrderBill, bool>> predicate = ExpressionBuilder.True<OrderBill>();
+            if (Search.StartDate != null)
             {
-                if (!string.IsNullOrWhiteSpace(StrSearch))
-                {
-                    switch (StrSearchType)
-                    {
-                        case "0":
-                            bills = bills.Where(b => b.BillID.Contains(StrSearch));
-                            break;
-                        case "1":
-                            bills = bills.Where(b => b.CGName.Contains(StrSearch));
-
-                            break;
-                        case "2":
-                            bills = bills.Where(b => b.SupName.Contains(StrSearch));
-
-                            break;
-                        default:
-
-                            break;
-                    }
-
-                }
+                predicate = predicate.And(b => b.BillDate >= Search.StartDate);
             }
+            if (Search.EndDate != null)
+            {
+                predicate = predicate.And(b => b.BillDate <= Search.EndDate);
+            }
+            if (!string.IsNullOrWhiteSpace(Search.BillID))
+            {
+                predicate = predicate.And(b => b.BillID.Contains(Search.BillID));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.SupName))
+            {
+                predicate = predicate.And(b => b.SupName.Contains(Search.SupName));
+            }
+            if (!string.IsNullOrWhiteSpace(Search.JSName))
+            {
+                predicate = predicate.And(b => b.CGName.Contains(Search.JSName));
+            }
+
+            IQueryable<OrderBill> bills = conn.OrderBill.Where(predicate);
 
             var lists = await bills.ToListAsync();
 

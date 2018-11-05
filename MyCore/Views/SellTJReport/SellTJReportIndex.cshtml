@@ -150,6 +150,7 @@
                 { label: '客户', name: 'SupName', index: 'SupName', width: 180, align: 'center' },
                 { label: '仓库', name: 'StoreName', index: 'StoreName', width: 120, align: 'center' },
                 { label: '金额', name: 'Sum', index: 'Sum', width: 120, align: 'center' },
+                { label: '快递费', name: 'GiveSum', index: 'GiveSum', width: 120, align: 'center' },
                 { label: '备注', name: 'BZ', index: 'BZ', width: 100, align: 'center' },
                 {
                     label: '审核状态', name: 'Status', index: 'Status', width: 100, align: 'center', formatter: function (cellvalue, options, rowObject) {
@@ -252,13 +253,17 @@
                     $(".ui-jqgrid-sdiv").show();
                     //页合计
                     var Sums = jQuery(this).getCol('Sum', false, 'sum');
+                    var GiveSums = jQuery(this).getCol('GiveSum', false, 'sum');
                     //总计
                     var AllSums = $("#list1").jqGrid('getGridParam', 'userData').sums;
-                    $(this).footerData("set", { "StoreName": "<font color='red'>" + "页合计:" + "<font>", "Sum": "<font color='red'>" + Sums + "<font>" });
+                    var AllGiveSums =$("#list1").jqGrid('getGridParam', 'userData').givesums;
+                    $(this).footerData("set", { "StoreName": "<font color='red'>" + "页合计:" + "<font>", "Sum": "<font color='red'>" + Sums + "<font>", "GiveSum": "<font color='red'>" + GiveSums + "<font>"});
                     $newFooterRow.find("td[aria-describedby*='StoreName']").text("总合计:");
                     $newFooterRow.find("td[aria-describedby*='StoreName']").css("color", "red");
                     $newFooterRow.find("td[aria-describedby*='Sum']").text(AllSums);
                     $newFooterRow.find("td[aria-describedby*='Sum']").css("color", "red");
+                    $newFooterRow.find("td[aria-describedby*='GiveSum']").text(AllGiveSums);
+                    $newFooterRow.find("td[aria-describedby*='GiveSum']").css("color", "red");
 
                 } else {
                     $(".ui-jqgrid-sdiv").hide();

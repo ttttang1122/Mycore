@@ -109,7 +109,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="layui-card-body">
+                    <div id="zxChartbody" class="layui-card-body">
                         <canvas id="zxChart"></canvas>
                     </div>
                 </div>
@@ -165,7 +165,12 @@
 
         });
 
-        function FXReport(stryears,strmonths) {
+        function FXReport(stryears, strmonths) {
+            $("#zxChartbody").empty();
+            var canvas = document.createElement("canvas");
+            $(canvas).attr("id", "zxChart");
+            $("#zxChartbody").append(canvas);
+            $("#zxChart").css("height", bodyheight + "px");
             var Onedatas = [];
             var OneName = stryears + '年' + strmonths + '月';     
             var textName = stryears + '年' + strmonths + '月' + '毛利报表';
@@ -184,8 +189,8 @@
                         $.each(Onebill, function (i) {
                             Onedatas.push(Onebill[i]);
                         });
-     
-                        var zxctx = $("#zxChart").get(0).getContext("2d");
+                        
+                        var zxctx = $("#zxChart").get(0).getContext("2d");           
                         var zxChar = new Chart(zxctx, {
                             type: 'bar',
                             data: {

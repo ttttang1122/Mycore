@@ -41,7 +41,7 @@
     <div class="layui-row layui-col-space10">
         <div class="layui-col-xs12">
             <div class="layui-card">
-                <div class="layui-card-body" style=" height:625px; margin-bottom:20px;box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);">
+                <div class="layui-card-body" style=" height:500px; margin-bottom:20px;box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);">
                     <form class="layui-form">
                         <div class="layui-form-item" style="margin-bottom:5px">
                             <label class="layui-form-label">单据日期</label>
@@ -86,6 +86,9 @@
     var layueform;
     //初始化界面
     $(function () {
+        var bodyheight = document.body.scrollHeight;
+        $(".layui-card-body").css("height", bodyheight - 55);
+
         $("#list1").jqGrid({
             styleUI: 'Bootstrap',
             datatype: "local",
@@ -127,7 +130,7 @@
             ],
             width: "100%",
             autowidth: true,
-            height: 500,
+            height: bodyheight-180,
             sortname: 'ID',//初始化的时候排序的字段
             sortorder: "desc",//排序方式,可选desc,asc
             //mtype: "post",//向后台请求数据的ajax的类型。可选post,get
@@ -453,7 +456,8 @@
                 _takenum = 0;
             }
             var _stocknum = Number(rowData.StockNum);
-            var _hownum = _takenum - _stocknum;
+            //var _hownum = _takenum - _stocknum;
+            var _hownum = $.SubNum(_takenum, _stocknum);
             $("#list1").jqGrid('setCell', id, 'HowNum', _hownum);
         } 
     });
