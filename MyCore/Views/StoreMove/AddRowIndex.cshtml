@@ -1,0 +1,203 @@
+﻿
+@{
+    ViewData["Title"] = "AddRowIndex";
+    Layout = "~/Views/Share/_LayoutBody.cshtml";
+}
+
+<style>
+    h2, .h2 {
+        margin-top: 0px;
+        margin-bottom: 0px;
+    }
+
+    .layui-form-item .layui-form-checkbox {
+        margin-top: 0px;
+    }
+
+    .layui-form-checkbox {
+        height: 20px;
+        line-height: 20px;
+    }
+
+        .layui-form-checkbox i {
+            height: 20px;
+        }
+</style>
+<div class="list-wall">
+    <div class="list-top">
+        <div class="layui-btn-group">
+            <form class="layui-form">
+                <div class="layui-form-item" style="margin-bottom:5px">
+                    <div class="layui-input-inline" style="width:100px">
+                        <select id="StrSearchType" name="query" lay-verify="required">
+                            <option value="0">商品名称</option>
+                            <option value="1">商品编号</option>
+                        </select>
+                    </div>
+                    <div class="layui-input-inline">
+                        <input type="text" id="StrSearch" name="title" required lay-verify="required" autocomplete="off" class="layui-input" style="width:200px;">
+                    </div>
+                    <div class="layui-input-inline" style="padding-left:10px;width:100px;">
+                        <button type="button" class="layui-btn layui-btn-xs layui-btn-normal" data-type="Search" id="Search"><i class="layui-icon ">&#xe615;</i> 查询</button>
+                    </div>
+                    <div class="layui-input-inline" style="padding-right:10px;width:120px;">
+                        <input id="Zore" type="checkbox" name="Zore" title="显示零库存" lay-filter="Zore">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="gridPanel">
+        <table id="list1" class="table table-condensed"></table>
+        <div id="pager1"></div>
+    </div>
+</div>
+<script>
+    var keyValue = $.request("ids");
+    var keyValueStroeid = $.request("StroeInfo_id");
+       $(function () {
+           $("#list1").jqGrid({
+               styleUI: 'Bootstrap',
+               url: '/StoreMove/GoodsStoreList/?Store_id=' + keyValueStroeid,
+               datatype: "json",
+               jsonReader: {
+                   repeatitems: false
+               },
+               colModel: [
+                   { label: 'id', name: 'id', index: 'id', key: true, width: 75, hidden: true },
+                   { label: '仓库主键', name: 'Store_id', index: 'Store_id', width: 80, align: 'center', hidden: true },
+                   { label: '商品主键', name: 'Good_id', index: 'Good_id', width: 80, align: 'center', hidden: true },
+                   { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 80, align: 'center' },
+                   { label: '商品名称', name: 'GoodName', index: 'GoodName', width: 180, align: 'center' },
+                   { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
+                   { label: '规格', name: 'GGType', index: 'GGType', width: 80, align: 'center' },
+                   { label: '数量', name: 'Num', index: 'Num', width: 100, align: 'center' },
+                   { label: '型号', name: 'ModelType', index: 'ModelType', width: 80, align: 'center' },
+                   { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 180, align: 'center' },
+                   { label: '进货价', name: 'Price', index: 'Price', width: 100, align: 'center' },
+                   { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
+                   { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center' },
+                   { label: '生产日期', name: 'scDate', index: 'scDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
+                   { label: '有效期至', name: 'yxqDate', index: 'yxqDate', formatter: "date", formatoptions: { newformat: 'Y-m-d' }, width: 100, align: 'center' },
+                   { label: '仓库名称', name: 'StoreName', index: 'StoreName', width: 100, align: 'center' },
+               ],
+               width: 575,
+               height: 295,
+               rowNum: 30,//一页显示多少条
+               rowList: [10, 20, 30, 50, 100],//可供用户选择一页显示多少条
+               pager: '#pager1',//表格页脚的占位符(一般是div)的id
+               sortname: 'Good_id',//初始化的时候排序的字段
+               sortorder: "asc",//排序方式,可选desc,asc
+               mtype: "post",//向后台请求数据的ajax的类型。可选post,get
+               viewrecords: true,
+               shrinkToFit: false,
+               rownumbers: true,
+               ondblClickRow: function (rowid, iRow, iCol, e) {
+                   submitForm();
+               },
+
+           });
+
+           layui.use('form', function () {
+               var form = layui.form;
+               $('#StrSearchType').val(0);
+               form.on('checkbox(Zore)', function (obj) {
+                   var CX_Check = "否";
+                   if (obj.elem.checked) {
+                       CX_Check = "是";
+
+                   } else {
+                       CX_Check = "否";
+
+                   }
+
+                   CX_StrSearchType = $('#StrSearchType').val();
+                   CX_StrSearch = $('#StrSearch').val();
+                   $("#list1").jqGrid('setGridParam', {
+                       datatype: 'json',
+                       postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch, "Check": CX_Check },
+                       //page: 1
+                   }).trigger("reloadGrid");
+
+
+               });
+               form.render();
+           });
+
+    });
+
+    $(function () {
+        $.hands = {
+            Search: function () {
+                $.loading(true, "正在查询数据");
+                CX_StrSearchType = $('#StrSearchType').val();
+                CX_StrSearch = $('#StrSearch').val();
+                var CX_Check = "否";
+                var check = document.getElementById("Zore").checked;
+
+                if (check == true) {
+                    CX_Check = "是";
+                } else {
+                    CX_Check = "否";
+                }
+                window.setTimeout(function () {
+                    $("#list1").jqGrid('setGridParam', {
+                        datatype: 'json',
+                        postData: { 'StrSearchType': CX_StrSearchType, 'StrSearch': CX_StrSearch, "Check": CX_Check },
+                        //page: 1
+                    }).trigger("reloadGrid");
+
+                    $.loading(false);
+                }, 500);
+            },
+            init: function () {
+                $('#Search').on('click', $.hands.Search);
+            }
+        }
+        $(function () {
+            $.hands.init();
+        });
+    });
+    function submitForm() {
+        var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+        var rowData = $("#list1").jqGrid("getRowData", id);//根据上面的id获得本行的所有数据
+        var IDs = rowData.id;
+        if (IDs == null || IDs == undefined) {
+            layer.msg("请选择一行", { icon: 2 });
+            return;
+        }
+        var item = {
+            "id": rowData.id,
+            "Store_id": rowData.Store_id,
+            "StoreName": rowData.StoreName,
+            "Good_id": rowData.Good_id,
+            "GoodID": rowData.GoodID,
+            "GoodName": rowData.GoodName,
+            "DW": rowData.DW,
+            "GGType": rowData.GGType,
+            "ModelType": rowData.ModelType,
+            "SCCJ": rowData.SCCJ,
+            "Price": rowData.Price,
+            "Num": rowData.Num,
+            "SCPH": rowData.SCPH,
+            "MJPH": rowData.MJPH,
+            "scDate": rowData.scDate,
+            "yxqDate": rowData.yxqDate,
+        };
+
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        $.currentWindow().GoodsAddRows(keyValue,item);
+        parent.layer.close(index);
+
+
+    }
+</script>
+
+
+
+
+
+
+
+
+

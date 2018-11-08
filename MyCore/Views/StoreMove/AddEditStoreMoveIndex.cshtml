@@ -1,0 +1,640 @@
+﻿
+@{
+    ViewData["Title"] = "AddEditStoreMoveIndex";
+    Layout = "~/Views/Share/_LayoutBody.cshtml";
+}
+
+<style>
+    #bottomField {
+        position: fixed;
+        top: 0;
+        right: 25px;
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 0px 0px 6px 6px;
+        padding: 10px;
+    }
+
+        #bottomField .btn-group {
+            font-size: 14px;
+            margin-top: -1px;
+            vertical-align: middle;
+            color: #666666;
+        }
+
+    .layui-form-label {
+        width: 80px;
+        padding: 2px 10px 0px 0px;
+    }
+
+    .ui-jqgrid .ui-jqgrid-btable tbody tr.jqgrow td {
+        padding-top: 5px;
+        padding-bottom: 5px;
+        line-height: 20px;
+    }
+
+    .modal-content {
+        position: absolute;
+    }
+</style>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space10">
+        <div class="layui-col-xs12">
+            <div class="layui-card">
+                <div class="layui-card-body" style=" height:500px; margin-bottom:20px;box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);">
+                    <form class="layui-form">
+                        <div class="layui-form-item" style="margin-bottom:5px">
+                            <label class="layui-form-label">单据日期</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <input type="text" name="BillDate" class="layui-input" id="BillDate">
+                            </div>
+                            <label class="layui-form-label">经手人</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <select id="YSName" name="YSName" lay-search lay-verify="required">
+                                    <option value="">==请选择==</option>
+                                </select>
+                            </div>
+                            <label class="layui-form-label">原仓库</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <select id="OutStoreName" name="OutStoreName" lay-search lay-verify="required" lay-filter="OutStoreName">
+                                    <option value="">==请选择==</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">调入仓库</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <select id="InStoreName" name="InStoreName" lay-search lay-verify="required" lay-filter="InStoreName">
+                                    <option value="">==请选择==</option>
+                                </select>
+                            </div>                          
+                            <label class="layui-form-label">备注</label>
+                            <div class="layui-input-inline" style="width:140px">
+                                <input type="text" id="BZ" name="BZ" class="layui-input" style="width:360px;">
+                            </div>
+                        </div>
+                    </form>
+
+                    <table id="list1" class="table table-condensed"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="bottomField">
+    <button type="button" class="layui-btn layui-btn-sm" data-type="Empty" id="Empty"><i class="layui-icon">&#xe6b1;</i>清空</button>
+    <button type="button" class="layui-btn layui-btn-sm" data-type="SaveAdd" id="SaveAdd"><i class="layui-icon">&#xe61f;</i>保存并新增</button>
+    <button type="button" class="layui-btn layui-btn-sm" data-type="AddClose" id="AddClose"><i class="layui-icon ">&#xe608;</i>保存</button>
+    <button type="button" class="layui-btn layui-btn-sm" data-type="AddSH" id="AddSH"><i class="layui-icon ">&#xe672;</i>保存并过账</button>
+</div>
+<script>
+    var keyValuetypes = $.request("types");//判断是新增或修改
+    var keyValueids = $.request("ids");//修改的单据号
+    var lastrow;  //最后修改行号先定义一个全局变量
+    var lastcell; //最后修改列号先定义一个全局变量
+    var layueform;
+    //初始化界面
+    $(function () {
+        var bodyheight = document.body.scrollHeight;
+        $(".layui-card-body").css("height", bodyheight - 55);
+
+        $("#list1").jqGrid({
+            styleUI: 'Bootstrap',
+            datatype: "local",
+            jsonReader: {
+                repeatitems: false
+            },
+            colModel: [
+                { label: 'ids', name: 'ids', index: 'ids', key: true, width: 75, hidden: true },
+                {
+                    label: '操作', name: 'Hand', index: 'Hand', width: 100, align: 'center', formatter: function (value, grid, rows, state) {
+                        var detail = ' <button onclick="AddGoods(\'' + rows.ids + '\');" class="layui-btn layui-btn-xs" lay-event="AddsGoods">新增</button> <button onclick="DelRow(\'' + rows.ids + '\');" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="DelRows">删除</button>';
+                        return detail;
+                    }
+                },
+                { label: '主键id', name: 'id', index: 'id', width: 100, align: 'center', hidden: true},
+                { label: '库存行id', name: 'StoreRow', index: 'StoreRow', width: 100, align: 'center', hidden: true},
+                { label: '商品id', name: 'Good_id', index: 'Good_id', width: 100, align: 'center', hidden: true},
+                { label: '商品编号', name: 'GoodID', index: 'GoodID', width: 100, align: 'center'},
+                { label: '*商品名称', name: 'GoodName', index: 'GoodName', width: 140, align: 'center' },
+                { label: '单位', name: 'DW', index: 'DW', width: 80, align: 'center' },
+                { label: '规格', name: 'GGType', index: 'GGType', width: 100, align: 'center' },
+                { label: '单价', name: 'Price', index: 'Price', width: 100, align: 'center', },
+                {
+                    label: '*数量', name: 'Num', index: 'Num', width: 100, align: 'center', editable: true,
+                    editrules: {
+                        edithidden: true, number: true, minValue: 0
+                    }
+
+                },               
+                { label: '生产批号', name: 'SCPH', index: 'SCPH', width: 100, align: 'center' },
+                { label: '灭菌批号', name: 'MJPH', index: 'MJPH', width: 100, align: 'center'},
+                { label: '生产日期', name: 'scDate', index: 'scDate', width: 100, align: 'center', },
+                {label: '有效期至', name: 'yxqDate', index: 'yxqDate', width: 100, align: 'center',},
+                { label: '型号', name: 'ModelType', index: 'ModelType', width: 100, align: 'center' },
+                { label: '生产厂家', name: 'SCCJ', index: 'SCCJ', width: 100, align: 'center' },
+                { label: '备注', name: 'BZ', index: 'BZ', width: 140, align: 'center', editable: true, },
+
+            ],
+            width: "100%",
+            autowidth: true,
+            height: bodyheight-180,
+            sortname: 'ID',//初始化的时候排序的字段
+            sortorder: "desc",//排序方式,可选desc,asc
+            //mtype: "post",//向后台请求数据的ajax的类型。可选post,get
+            viewrecords: true,
+            shrinkToFit: false,
+            rownumbers: true,
+            cellEdit: true,
+            cellsubmit: 'clientArray',
+            beforeEditCell: function (rowid, cellname, v, iRow, iCol) {
+                lastrow = iRow;  //给全局变量赋值
+                lastcell = iCol;
+            }
+
+        });
+        //填充100行空行
+        for (var i = 1; i <= 100; i++) {
+            var item = {
+                "ids": i,
+                "Good_id": '',
+                "GoodID": '',
+                "GoodName": '',
+                "DW": '',
+                "GGType": '',
+                "ModelType": '',
+                "SCCJ": '',
+                "Price": '',
+                "Num": '',
+                "BZ": ''
+            };
+            $("#list1").jqGrid("addRowData", i, item, "last");
+        }
+        layui.use(['table', 'form', 'layedit', 'laydate'], function () {
+            var form = layui.form
+                , layer = layui.layer
+                , layedit = layui.layedit
+                , laydate = layui.laydate
+                , table = layui.table;
+
+            var strdate = new Date().Format("yyyy-MM-dd");
+            //销售员
+            $("#YSName").bindSelect({
+                url: "/StoreMove/GetUser",
+                id: "id",
+                text: "UserName"
+            });
+            //仓库
+            $("#InStoreName").bindSelect({
+                url: "/StoreMove/GetStoreInfo",
+                id: "id",
+                text: "StoreName"
+            });
+            $("#OutStoreName").bindSelect({
+                url: "/StoreMove/GetStoreInfo",
+                id: "id",
+                text: "StoreName"
+            });
+            //新增初始化
+            if (keyValuetypes == "add") {
+                var strdate = new Date().Format("yyyy-MM-dd");
+                laydate.render({
+                    elem: '#BillDate',//制定元素
+                    type: 'date',
+                    show: false,//默认显示
+                    position: 'fixed',
+                    value: strdate,
+                    isInitValue: true, //是否允许填充初始值，默认为 true
+
+                });
+            }
+            //修改初始化
+            else if (keyValuetypes == "edit") {
+                if (!!keyValueids) {
+                    $.ajax({
+                        url: "/StoreMove/GetBillList",
+                        data: { ids: keyValueids },
+                        dataType: "json",
+                        async: false,
+                        success: function (datas) {
+                            var bill = datas.bills;
+                            var bill_mx = datas.bills.storeMoveBill_MX;
+                            $("#YSName").val(bill.ysNameID);
+                            var BillDates = bill.billDate.toString().substring(0, 10);
+                            $("#BillDate").val(BillDates);
+                            $("#OutStoreName").val(bill.outStroeInfo_id);
+                            $("#InStoreName").val(bill.inStroeInfo_id);
+                            $("#BZ").val(bill.bz);
+                            $.each(bill_mx, function (i) {
+                                var scdates = "";
+                                var yxqDate = "";
+                                if (bill_mx[i].scDate != null && bill_mx[i].scDate !=undefined) {
+                                    scdates = bill_mx[i].scDate.toString().substring(0, 10);
+                                }
+                                if (bill_mx[i].yxqDate != null && bill_mx[i].yxqDate != undefined) {
+                                    yxqDate = bill_mx[i].yxqDate.toString().substring(0, 10);
+                                }
+                                var item = {
+                                    "id": bill_mx[i].id,
+                                    "StoreRow": bill_mx[i].storeRow,
+                                    "Good_id": bill_mx[i].good_id,
+                                    "GoodID": bill_mx[i].goodID,
+                                    "GoodName": bill_mx[i].goodName,
+                                    "DW": bill_mx[i].dw,
+                                    "GGType": bill_mx[i].ggType,
+                                    "ModelType": bill_mx[i].modelType,
+                                    "SCCJ": bill_mx[i].sccj,
+                                    "Price": bill_mx[i].price,
+                                    "Num": bill_mx[i].num,                              
+                                    "SCPH": bill_mx[i].scph,
+                                    "MJPH": bill_mx[i].mjph,
+                                    "scDate": scdates,
+                                    "yxqDate": yxqDate,
+                                    "BZ": bill_mx[i].bz,
+                                };
+                                AddRows(i + 1, item);
+
+                            });
+
+
+                        }
+                    });
+                    $('#Empty').hide();
+                    $('#SaveAdd').hide();
+                }
+                laydate.render({
+                    elem: '#BillDate',//制定元素
+                    type: 'date',
+                    show: false,//默认显示
+                    position: 'fixed',
+                    //value: strdate,
+                    //isInitValue: true, //是否允许填充初始值，默认为 true
+
+                });
+
+            }
+            form.on('select(StoreName)', function (data) {
+                for (var i = 1; i <= 100; i++) {
+                    DelRow(i);
+                }
+                $("#Sum").val('');
+            });
+            layueform = form;
+            form.render();
+
+        });
+
+    });
+    //选择商品弹出框
+    function AddGoods(ids) {
+        var StroeInfo_id = $('#OutStoreName').val();
+        if (StroeInfo_id == "" || StroeInfo_id == undefined || StroeInfo_id == null) {
+            layer.msg("请选择仓库", { icon: 2 });
+            return false;
+        }
+        var url = "/StoreMove/AddRowIndex" + "?ids=" + ids +"&StroeInfo_id=" + StroeInfo_id;
+        $.FromOpen('StoreMoveFromAddRow', '选择商品库存信息', url, '600px', '500px', '1000');
+    };
+
+    //新增一行商品库存
+    function GoodsAddRows(ids, item) {
+        $("#list1").jqGrid('setCell', ids, 'StoreRow', item.id);
+        $("#list1").jqGrid('setCell', ids, 'Good_id', item.Good_id);
+        $("#list1").jqGrid('setCell', ids, 'GoodID', item.GoodID);
+        $("#list1").jqGrid('setCell', ids, 'GoodName', item.GoodName);
+        $("#list1").jqGrid('setCell', ids, 'DW', item.DW);
+        $("#list1").jqGrid('setCell', ids, 'GGType', item.GGType);
+        $("#list1").jqGrid('setCell', ids, 'ModelType', item.ModelType);
+        $("#list1").jqGrid('setCell', ids, 'SCCJ', item.SCCJ);
+        $("#list1").jqGrid('setCell', ids, 'Price', item.Price);
+        $("#list1").jqGrid('setCell', ids, 'Num', 1);
+        $("#list1").jqGrid('setCell', ids, 'SCPH', item.SCPH);
+        $("#list1").jqGrid('setCell', ids, 'MJPH', item.MJPH);
+        $("#list1").jqGrid('setCell', ids, 'scDate', item.scDate);
+        $("#list1").jqGrid('setCell', ids, 'yxqDate', item.yxqDate);
+        $("#list1").jqGrid('setCell', ids, 'BZ', item.BZ);
+    };
+    //加载出库单
+    function AddRows(ids, item) {
+        //$("#list1").jqGrid('setCell', ids, 'id', item.id);
+        $("#list1").jqGrid('setCell', ids, 'StoreRow', item.StoreRow);
+        $("#list1").jqGrid('setCell', ids, 'Good_id', item.Good_id);
+        $("#list1").jqGrid('setCell', ids, 'GoodID', item.GoodID);
+        $("#list1").jqGrid('setCell', ids, 'GoodName', item.GoodName);
+        $("#list1").jqGrid('setCell', ids, 'DW', item.DW);
+        $("#list1").jqGrid('setCell', ids, 'GGType', item.GGType);
+        $("#list1").jqGrid('setCell', ids, 'ModelType', item.ModelType);
+        $("#list1").jqGrid('setCell', ids, 'SCCJ', item.SCCJ);
+        $("#list1").jqGrid('setCell', ids, 'Price', item.Price);
+        $("#list1").jqGrid('setCell', ids, 'Num', item.Num);
+        $("#list1").jqGrid('setCell', ids, 'SCPH', item.SCPH);
+        $("#list1").jqGrid('setCell', ids, 'MJPH', item.MJPH);
+        $("#list1").jqGrid('setCell', ids, 'scDate', item.scDate);
+        $("#list1").jqGrid('setCell', ids, 'yxqDate', item.yxqDate);
+        $("#list1").jqGrid('setCell', ids, 'BZ', item.BZ);
+    };
+    //删除一行商品信息
+    function DelRow(ids) {
+        $("#list1").jqGrid('setCell', ids, 'StoreRow', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'Good_id', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'GoodID', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'GoodName', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'DW', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'GGType', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'ModelType', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'SCCJ', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'Price', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'SCPH', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'MJPH', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'scDate', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'yxqDate', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'Num', "&nbsp");
+        $("#list1").jqGrid('setCell', ids, 'BZ', "&nbsp");
+    };
+
+    $(function () {
+        $.hands = {
+            //清空
+            Empty: function () {
+                for (var i = 1; i <= 100; i++) {
+                    DelRow(i);
+                }
+                $("#YSName").val('');
+                $("#InStoreName").val('');
+                $("#OutStoreName").val('');
+                layueform.render('select');
+            },
+            //保存并新增
+            SaveAdd: function () {
+                var shs = "no";
+                var flag = $.hands.Add(keyValuetypes, shs);
+                if (flag) {
+                    var rowdata = [];
+                    for (var i = 1; i <= 100; i++) {
+                        DelRow(i);
+                    }
+                };
+
+            },
+            //保存并关闭
+            AddClose: function () {
+                var shs = "no";
+                var flag = $.hands.Add(keyValuetypes, shs);
+                if (flag) {
+                    top.$("#LAY_app_tabsheader").children(".layui-this").children(".layui-tab-close").trigger("click");
+                };
+
+            },
+            //保存并审核
+            AddSH: function () {
+                var shs = "yes";
+                var flag = $.hands.Add(keyValuetypes,shs);
+                if (flag) {
+                    top.$("#LAY_app_tabsheader").children(".layui-this").children(".layui-tab-close").trigger("click");
+                };
+
+            },
+            //保存
+            Add: function (BillType,SHType) {
+                $('#list1').jqGrid("saveCell", lastrow, lastcell);
+                //选择日期判断
+                var BillDate = $('#BillDate').val();
+                if (BillDate == "" || BillDate == undefined || BillDate == null) {
+                    layer.msg("请选择日期", { icon: 2 });
+                    return false;
+                }
+                //选择销售员判断
+                var YSNameID = $('#YSName').val();
+                if (YSNameID == "" || YSNameID == undefined || YSNameID == null) {
+                    layer.msg("请选择经手人", { icon: 2 });
+                    return false;
+                }
+                var YSName = $("#YSName option:selected").text();
+                //选择原仓库判断
+                var OutStroeInfo_id = $('#OutStoreName').val();
+                if (OutStroeInfo_id == "" || OutStroeInfo_id == undefined || OutStroeInfo_id == null) {
+                    layer.msg("请选择原仓库", { icon: 2 });
+                    return false;
+                }
+                var OutStoreName = $("#OutStoreName option:selected").text();
+
+                //选择原仓库判断
+                var InStroeInfo_id = $('#InStoreName').val();
+                if (InStroeInfo_id == "" || InStroeInfo_id == undefined || InStroeInfo_id == null) {
+                    layer.msg("请选择调入仓库", { icon: 2 });
+                    return false;
+                }
+               
+                var InStoreName = $("#InStoreName option:selected").text();
+                if (OutStroeInfo_id == InStroeInfo_id) {
+
+                    layer.msg("原仓库与调入仓库不能相同", { icon: 2 });
+                    return false;
+                }
+                var BZ = $('#BZ').val();
+                //明细数据
+                var AddData = [];
+                var datas = $("#list1").jqGrid("getRowData");
+                //判断明细是否是否正确
+                var dataFlag = true;
+               // 求和
+                var sums = 0;
+                $.each(datas, function (i) {
+                    var row = datas[i];
+                    if (row.GoodName != "" && row.GoodName != undefined && row.GoodName != null) {
+                        //判断数量是否为空或者数量为0
+                        var datanum = Number(row.Num);
+                        if (isNaN(datanum)) {
+                            dataFlag = false;
+                            return false;
+                        }
+                        if (datanum <= 0) {
+
+                            dataFlag = false;
+                            return false;
+                        }
+                      
+                        AddData.push(row);
+                    }
+
+                });
+                if (dataFlag == false) {
+                    layer.msg("请输入正确数量", { icon: 2 });
+                    return false;
+
+                }
+  
+
+
+                if (AddData.length > 0) {
+                    var Bill = {
+                        "BillDate": BillDate,
+                        "OutStroeInfo_id": OutStroeInfo_id,
+                        "OutStoreName": OutStoreName,
+                        "InStroeInfo_id": InStroeInfo_id,
+                        "InStoreName": InStoreName,
+                        "YSNameID": YSNameID,
+                        "YSName": YSName,
+                        "Sum": sums,
+                        "BZ": BZ
+                    };
+                    var flag = false;
+                    if (BillType == "add") {
+                        $.loading(true, "正在提交数据");
+                        $.ajax({
+                            url: "/StoreMove/SaveBill",
+                            data: { SHType: SHType, Bills: Bill, Bills_MX: AddData },
+                            dataType: "json",
+                            type: "post",
+                            async: false,
+                            success: function (data) {
+                                $.loading(false);
+                                if (data.errorMsg) {
+                                    flag = false;
+                                    top.layer.msg(data.errorMsg, { icon: 2 });
+
+                                }
+                                else {
+                                    var msgs = (data.okMsg);
+                                    flag = true;
+                                    top.layer.msg(msgs, { icon: 1 });
+
+                                }
+                            },
+                            error: function () {
+                                $.loading(false);
+
+
+                            },
+                            complete: function () {
+                                $.loading(false);
+
+                            }
+                        });
+                        return flag;
+                    }
+                    else {
+                        $.loading(true, "正在提交数据");
+                        $.ajax({
+                            url: "/StoreMove/EditBill",
+                            data: { ids: keyValueids, SHType: SHType, Bills: Bill, Bills_MX: AddData },
+                            dataType: "json",
+                            type: "post",
+                            async: false,
+                            success: function (data) {
+                                $.loading(false);
+                                if (data.errorMsg) {
+                                    flag = false;
+                                    top.layer.msg(data.errorMsg, { icon: 2 });
+
+                                }
+                                else {
+                                    var msgs = (data.okMsg);
+                                    flag = true;
+                                    top.layer.msg(msgs, { icon: 1 });
+
+                                }
+                            },
+                            error: function () {
+                                $.loading(false);
+
+
+                            },
+                            complete: function () {
+                                $.loading(false);
+
+                            }
+                        });
+                        return flag;
+
+                    }
+                }
+                else {
+                    layer.msg("请输入商品信息", { icon: 2 });
+                    return false;
+                }
+
+            },
+
+            init: function () {
+                $('#Empty').on('click', $.hands.Empty);
+                $('#SaveAdd').on('click', $.hands.SaveAdd);
+                $('#AddClose').on('click', $.hands.AddClose);
+                $('#AddSH').on('click', $.hands.AddSH);
+            }
+        }
+        $(function () {
+            $.hands.init();
+        });
+    });
+
+    //计算和
+    //function SumMoney() {
+    //    var sums = 0;
+    //    var datas = $("#list1").jqGrid("getRowData");
+    //    $.each(datas, function (i) {
+    //        var row = datas[i];
+    //        if (row.GoodName != "" && row.GoodName != undefined && row.GoodName != null) {
+    //            var rowsum = Number(row.Sum);
+
+    //            if (isNaN(rowsum) ) {
+    //                rowsum = 0;;
+    //            }
+    //            //sums = sums + rowsum;
+    //            sums = $.SumNum(sums, rowsum);
+    //        }
+
+    //    });
+    //    $("#Sum").val(sums);
+
+    //}
+    ////计算单价 数量 金额
+    //$(document).on('keyup', '#list1>tbody>tr>td>input[type="text"]', function () {
+    //    var _inputName = $(this).attr('name');
+
+    //    if (_inputName == "Price") {
+    //        var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+    //        var rowData = $("#list1").jqGrid("getRowData", id);
+    //        var _price = Number($(this).val());
+    //        if (isNaN(_price)) {
+    //            _price = 0;
+    //        }
+    //        var _num = Number(rowData.Num);
+    //        var _sum = $.MulNum(_price, _num);
+
+    //        $("#list1").jqGrid('setCell', id, 'Sum', _sum);
+    //        SumMoney();
+
+    //    } else if (_inputName == "Num") {
+    //        var id = $("#list1").jqGrid('getGridParam', 'selrow');//根据点击行获得点击行的id（id为jsonReader: {id: "id" },）
+    //        var rowData = $("#list1").jqGrid("getRowData", id);
+    //        var _price = Number(rowData.Price);
+    //        var _num = Number($(this).val());
+    //        if (isNaN(_num)) {
+    //            _num = 0;
+    //        }
+    //        var _sum = $.MulNum(_price, _num);
+    //        $("#list1").jqGrid('setCell', id, 'Sum', _sum);
+    //        SumMoney();
+    //    }
+    //});
+
+</script>
+<style>
+    .form-control {
+        height: 20px;
+        text-align: center;
+        display: table-cell;
+        vertical-align: middle
+    }
+</style>
+
+
+
+
+
+
+
+
+
+
+

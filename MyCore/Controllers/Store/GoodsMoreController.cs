@@ -23,6 +23,7 @@ namespace MyCore.Controllers.Store
         {
             conn = _conn;
         }
+
         public IActionResult GoodsMoreIndex()
         {
             return View();
@@ -495,6 +496,7 @@ namespace MyCore.Controllers.Store
 
             return File(buffer, "application/vnd.ms-excel", fileName);
         }
+
         public async Task<IActionResult> GetBillList(int ids)
         {
             var bill = await conn.MoreLoseBill.FirstOrDefaultAsync(b => b.id == ids);

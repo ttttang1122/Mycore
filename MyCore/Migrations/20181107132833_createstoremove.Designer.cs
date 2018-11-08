@@ -10,9 +10,10 @@ using System;
 namespace MyCore.Migrations
 {
     [DbContext(typeof(MyCoreContext))]
-    partial class MyCoreContextModelSnapshot : ModelSnapshot
+    [Migration("20181107132833_createstoremove")]
+    partial class createstoremove
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -865,8 +866,6 @@ namespace MyCore.Migrations
                         .HasMaxLength(45);
 
                     b.Property<int?>("OutStroeInfo_id");
-
-                    b.Property<decimal>("Price");
 
                     b.Property<string>("SCCJ")
                         .HasMaxLength(145);

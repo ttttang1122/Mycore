@@ -36,6 +36,8 @@ namespace MyCore.DAL
         public DbSet<MoreLoseBill_MX> MoreLoseBill_MX { get; set; }
         public DbSet<TakeStockBill> TakeStockBill { get; set; }
         public DbSet<TakeStockBill_MX> TakeStockBill_MX { get; set; }
+        public DbSet<StoreMoveBill> StoreMoveBill { get; set; }
+        public DbSet<StoreMoveBill_MX> StoreMoveBill_MX { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -58,6 +60,9 @@ namespace MyCore.DAL
             modelBuilder.Entity<MoreLoseBill_MX>();
             modelBuilder.Entity<TakeStockBill>();
             modelBuilder.Entity<TakeStockBill_MX>();
+            modelBuilder.Entity<StoreMoveBill>();
+            modelBuilder.Entity<StoreMoveBill_MX>();
+
         }
     }
 }
