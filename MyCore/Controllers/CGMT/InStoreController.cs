@@ -129,7 +129,7 @@ namespace MyCore.Controllers.CGMT
         [HttpGet]
         public async Task<IActionResult> GetStoreInfo()
         {
-            var stores = await conn.StoreInfo.ToListAsync();
+            var stores = await conn.StoreInfo.Where(b=>b.Status==1).ToListAsync();
             var data = stores.Select(p => new { p.id, p.StoreName });
             return Content(data.ToJson());
         }
