@@ -14,9 +14,9 @@
                 </div>
                 <div class="layui-input-inline" style="width:200px;z-index:100">
                     <div class="ui-filter" style="width: 200px;">
-                        <div class="ui-filter-text">
+                        <div  id="btn_Search" class="ui-filter-text">
                             <strong id="StartTime">2018-01-01</strong>  至 <strong id="EndTime">现在</strong>
-                            <i authorize="yes" id="btn_Search" style="float:right;padding-right:2px" class="layui-icon ">&#xe625;</i>
+                            <i authorize="yes"  style="float:right;padding-right:2px" class="layui-icon ">&#xe625;</i>
                         </div>
                         <div id="list-Search" class="ui-filter-list" style="width: 450px;">
                             <form id="form1" class="layui-form">
@@ -480,7 +480,7 @@
 
                 }
 
-            },
+            },      
             Clear: function () {
                 $('#form1')[0].reset();
                 var strdate = new Date().Format("yyyy-MM-dd");
@@ -497,6 +497,7 @@
                 $('#NOSH').on('click', $.hands.NOSH);
                 $('#Clear').on('click', $.hands.Clear);
                 $('#btn_Search').on('click', $.hands.BtnSearch);
+               
             }
         }
         $(function () {
