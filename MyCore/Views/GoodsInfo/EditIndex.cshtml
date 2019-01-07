@@ -20,6 +20,7 @@
             });
         }
     });
+ 
     function submitForm() {
         $("#form1").validate({
             rules: {
@@ -71,13 +72,13 @@
                 <tr style="display:none;">
                     <th class="formTitle">序号</th>
                     <td class="formValue">
-                        <input id="id" name="id" type="text" class="form-control input-sm"  readonly="true" autocomplete="off" />
+                        <input id="id" name="id" type="text" class="form-control input-sm"  autocomplete="off" />
                     </td>
                 </tr>
                 <tr>
                     <th class="formTitle">商品名称</th>
                     <td class="formValue">
-                        <input id="GoodName" name="GoodName" type="text" class="form-control input-sm"  readonly="true" autocomplete="off" />
+                        <input id="GoodName" name="GoodName" type="text" class="form-control input-sm"   autocomplete="off" />
                     </td>
                     <th class="formTitle">商品编号</th>
                     <td class="formValue">
@@ -153,3 +154,11 @@
         </div>
     </form>
 </div>
+<script src="~/js/PYM.js"></script>
+<script>
+    $('input[name="GoodName"]').on('input propertychange', function () {
+
+        var pym = pinyin.getCamelChars(this.value);
+        $('#PYM').val(pym);
+    })
+</script>

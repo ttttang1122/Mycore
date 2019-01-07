@@ -88,19 +88,13 @@
         </div>
     </form>
 </div>
+<script src="~/js/PYM.js"></script>
 <script>
-    //$(function () {
-    //    $("#RID").bindSelect({
-    //        url: "/User/GetRole",
-    //        id: "id",
-    //        text: "RoleName"
-    //    });
-    //    $("#OID").bindSelect({
-    //        url: "/User/GetOffice",
-    //        id: "id",
-    //        text: "OfficeName"
-    //    });
-    //});
+    $('input[name="GoodName"]').on('input propertychange', function () {
+        
+      var pym=pinyin.getCamelChars(this.value);
+        $('#PYM').val(pym);
+    })
     function submitForm() {
         $("#form1").validate({
             rules: {

@@ -38,7 +38,7 @@
             }
         });
         if ($('#form1').valid()) {
-           $.loading(true, "正在提交数据");
+            $.loading(true, "正在提交数据");
             window.setTimeout(function () {
                 $.ajax({
                     url: "/SuperInfo/EditSup/",
@@ -139,11 +139,18 @@
                 <tr>
                     <th class="formTitle">备注</th>
                     <td class="formValue" colspan="3">
-                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 60px;" autocomplete="off" ></textarea>
+                        <textarea id="BZ" name="BZ" class="form-control input-sm" style="height: 60px;" autocomplete="off"></textarea>
                     </td>
                 </tr>
             </table>
         </div>
     </form>
 </div>
+<script src="~/js/PYM.js"></script>
+<script>
+    $('input[name="SupName"]').on('input propertychange', function () {
 
+        var pym = pinyin.getCamelChars(this.value);
+        $('#PYM').val(pym);
+    })
+</script>
